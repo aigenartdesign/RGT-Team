@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="cache-control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="expires" content="0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Stundenzettel">
@@ -633,13 +636,63 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 </div>
 
 <script>
-const PLAN={
-  1:{kz:'Mo',az:'7:30–15:00', soll:7.00,pause:'0:30',team:false},
-  2:{kz:'Di',az:'10:00–14:20',soll:4.20,pause:'–',   team:false},
-  3:{kz:'Mi',az:'8:00–13:30', soll:5.30,pause:'–',   team:false},
-  4:{kz:'Do',az:'8:00–16:00', soll:8.30,pause:'–',   team:true },
-  5:{kz:'Fr',az:'10:00–15:00',soll:5.00,pause:'–',   team:false},
-};
+// 🔧 PLAN dynamisch aus gespeicherten Daten laden
+function buildPlanFromUserData() {
+  const names = Object.keys(localStorage).filter(k => k.startsWith('stundenzettel_'));
+  if (names.length === 0) {
+    return getDefaultPlan(); // Fallback zu Standard
+  }
+  
+  const userData = JSON.parse(localStorage.getItem(names[names.length - 1]));
+  const schedule = userData.schedule || [];
+  
+  const dayMap = { 'Montag': 1, 'Dienstag': 2, 'Mittwoch': 3, 'Donnerstag': 4, 'Freitag': 5 };
+  const dayKz = { 1: 'Mo', 2: 'Di', 3: 'Mi', 4: 'Do', 5: 'Fr' };
+  
+  const newPlan = {};
+  
+  // Baue PLAN aus gespeicherten Schedule-Daten
+  schedule.forEach(item => {
+    const dow = dayMap[item.day];
+    if (dow) {
+      const [vonH, vonM] = (item.von || '07:30').split(':').map(Number);
+      const [bisH, bisM] = (item.bis || '15:00').split(':').map(Number);
+      
+      const vonDec = vonH + vonM / 60;
+      const bisDec = bisH + bisM / 60;
+      const soll = Math.round((bisDec - vonDec - 0.5) * 100) / 100; // -0:30 Pause
+      
+      newPlan[dow] = {
+        kz: dayKz[dow],
+        az: `${item.von}–${item.bis}`,
+        soll: Math.max(0, soll),
+        pause: '0:30',
+        team: item.team ? 1 : false
+      };
+    }
+  });
+  
+  // Fallback für fehlende Tage
+  for (let d = 1; d <= 5; d++) {
+    if (!newPlan[d]) {
+      newPlan[d] = getDefaultPlan()[d];
+    }
+  }
+  
+  return newPlan;
+}
+
+function getDefaultPlan() {
+  return {
+    1:{kz:'Mo',az:'7:30–15:00', soll:7.00,pause:'0:30',team:false},
+    2:{kz:'Di',az:'10:00–14:20',soll:4.20,pause:'–',   team:false},
+    3:{kz:'Mi',az:'8:00–13:30', soll:5.30,pause:'–',   team:false},
+    4:{kz:'Do',az:'8:00–16:00', soll:8.30,pause:'–',   team:true },
+    5:{kz:'Fr',az:'10:00–15:00',soll:5.00,pause:'–',   team:false},
+  };
+}
+
+const PLAN = buildPlanFromUserData();
 const WSOLL=31,TDEF=1,VDEF=1,STEP=0.15;
 const MN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 const TKZ=['So','Mo','Di','Mi','Do','Fr','Sa'];
@@ -1276,31 +1329,47 @@ function init(){
 load();
 
 // 🔧 DYNAMISCHER NAME AUS LOCALSTORAGE LADEN
-let currentUserName = sessionStorage.getItem('current_user');
+// Versuche ZUERST die aktuelle Person aus dem PLAN zu ermitteln
+let currentUserName = null;
+
+// Methode 1: Aus sessionStorage (wenn noch vorhanden)
+currentUserName = sessionStorage.getItem('current_user');
+
+// Methode 2: Fallback - suche die NEUESTE Person in localStorage
 if (!currentUserName) {
-  // Fallback: Letzte gespeicherte Person finden
-  for (let i = localStorage.length - 1; i >= 0; i--) {
+  let newestTime = 0;
+  for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (key && key.startsWith('stundenzettel_')) {
-      currentUserName = key.replace('stundenzettel_', '');
-      break;
+      try {
+        const data = JSON.parse(localStorage.getItem(key));
+        const time = new Date(data.erstellt).getTime();
+        if (time > newestTime) {
+          newestTime = time;
+          currentUserName = key.replace('stundenzettel_', '');
+        }
+      } catch (e) {}
     }
   }
 }
 
-// Konvertiere zurück zu lesbarem Format (z.B. "ADAM_RIESE" → "Adam Riese")
+// Konvertiere zu lesbarem Format (z.B. "TIM" → "Tim", "ADAM_RIESE" → "Adam Riese")
 if (currentUserName) {
   const displayEl = document.getElementById('displayName');
   if (displayEl) {
     const readableName = currentUserName
-      .replace(/_/g, ' ')
-      .split(' ')
-      .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+      .split('_')
+      .map(word => {
+        if (word.length === 0) return '';
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
       .join(' ');
     displayEl.textContent = readableName;
   }
+  // Speichere den Namen für buildShareText
+  window.displayName = currentUserName;
 } else {
-  // Fallback auf index.html wenn kein User gefunden
+  // Kein User gefunden - zurück zu index.html
   window.location.href = 'index.html';
 }
 
