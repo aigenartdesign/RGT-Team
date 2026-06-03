@@ -567,10 +567,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-se
 </div>
 
 <div id="bar">
-  <!-- 3 Buttons nebeneinander -->
-  <button class="bb-share" style="width:45%; margin-right:10px;" onclick="saveJanineToDashboard()">👤 Janine</button>
-  <button class="bb-share" style="width:10%;" onclick="openShareModal()" title="Teilen">📤</button>
-  <button class="bb-share" style="width:45%;" onclick="saveJasminWithConfirm()">✨ Jasmin</button>
+  <!-- 2 Buttons: Janine (pink) + Teilen (grün) -->
+  <button class="bb-share" style="width:48%; margin-right:10px;" onclick="saveJanineToDashboard()">👤 Janine</button>
+  <button style="width:48%; padding:14px 24px; border:none; border-radius:14px; font-family:'Poppins',sans-serif; font-weight:600; font-size:15px; cursor:pointer; background:linear-gradient(135deg,#4f9ff0 0%,#357abd 100%); color:white; box-shadow:0 8px 24px rgba(79,159,240,0.3);" onclick="openShareModal()">📤 Teilen</button>
   <button class="bb-save"  id="saveBtn">💾 Speichern</button>
   <button class="bb-print" id="printBtn">🖨 Drucken</button>
 </div>
