@@ -21,6 +21,7 @@
             --txt: #0d1f10;
             --sub: #5a7a5e;
             --red: #d93025;
+            --ora: #e07b00;
             --grn-light: #d4f5d4;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,18 +29,19 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
             background: var(--bg);
             color: var(--txt);
+            padding: 0;
             padding-bottom: 20px;
         }
         
         /* HEADER */
         .header {
             background: linear-gradient(to bottom, var(--dark) 0%, var(--mid) 30%, var(--grn) 65%, transparent 100%);
-            padding: 20px 20px 40px;
+            padding: 20px 20px 30px;
             text-align: center;
             color: white;
         }
         .header-app {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -47,18 +49,24 @@
             margin-bottom: 4px;
         }
         .header-name {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 900;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             text-shadow: 0 2px 12px rgba(0,0,0,0.25);
         }
         .header-info {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 8px;
+            gap: 12px;
+            font-size: 12px;
+            opacity: 0.85;
+            margin-bottom: 4px;
+        }
+        .header-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 6px 14px;
+            border-radius: 99px;
+            border: 1px solid rgba(255,255,255,0.25);
         }
         .header-saldo {
             background: rgba(255,255,255,0.15);
@@ -72,106 +80,240 @@
         .container {
             padding: 0 16px;
         }
-        .month-section {
-            background: white;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .month-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark);
-            padding: 12px;
-            background: var(--grn-light);
-            border-radius: 10px;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-        .week-section {
-            background: #f9f9f9;
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        .week-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 12px;
-            padding: 8px 12px;
-            background: white;
-            border-radius: 8px;
-        }
-        .day-entry {
-            background: white;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 8px;
+        
+        /* MONAT NAVIGATION */
+        .month-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 4px solid var(--grn);
+            color: white;
+            padding: 16px 0 12px;
         }
-        .day-info {
+        .month-nav-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .month-nav-btn:active {
+            background: rgba(255,255,255,0.25);
+        }
+        .month-title {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        /* HEUTE CARD */
+        .today-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+        .today-label {
+            background: var(--grn);
+            color: white;
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 12px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .today-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .today-dayinfo {
             flex: 1;
         }
-        .day-label {
+        .today-day {
+            font-size: 18px;
             font-weight: 700;
-            font-size: 14px;
             color: var(--txt);
         }
-        .day-date {
-            font-size: 12px;
+        .today-time {
+            font-size: 14px;
             color: var(--sub);
-            margin-bottom: 2px;
+            margin-top: 2px;
         }
-        .day-time {
-            font-size: 13px;
-            color: var(--sub);
-        }
-        .day-value {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--grn);
-            min-width: 60px;
+        .today-hours-display {
             text-align: right;
-            margin-right: 12px;
         }
-        .day-controls {
+        .today-hours {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--grn);
+            line-height: 1;
+        }
+        .today-hours-label {
+            font-size: 14px;
+            color: var(--sub);
+            margin-top: 2px;
+        }
+        
+        /* PROGRESS BAR */
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            margin: 12px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: var(--grn);
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        /* BUTTONS */
+        .controls {
             display: flex;
-            gap: 6px;
+            gap: 10px;
+            margin-bottom: 12px;
         }
         .btn-ctrl {
-            width: 32px;
-            height: 32px;
+            width: 44px;
+            height: 44px;
             border: none;
             border-radius: 50%;
-            font-size: 18px;
+            font-size: 24px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
             font-weight: 700;
+            flex-shrink: 0;
         }
         .btn-minus {
-            background: #ffebee;
+            background: #ffcdd2;
             color: var(--red);
         }
         .btn-minus:active {
-            background: #ffcdd2;
+            background: #ef9a9a;
         }
         .btn-plus {
             background: var(--grn-light);
             color: var(--grn);
         }
         .btn-plus:active {
-            background: #b3e5b3;
+            background: #a8e6a8;
         }
         
-        /* FOOTER BUTTONS */
+        /* STATUS BUTTONS */
+        .status-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .btn-status {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            background: white;
+            color: var(--txt);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-status:active {
+            background: var(--grn-light);
+            border-color: var(--grn);
+        }
+        .btn-status.active {
+            background: var(--grn-light);
+            border-color: var(--grn);
+        }
+        
+        /* BEMERKUNGEN */
+        .notes-section {
+            margin-top: 12px;
+        }
+        .notes-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--sub);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .notes-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--txt);
+            resize: none;
+            height: 60px;
+        }
+        .notes-input::placeholder {
+            color: var(--faint);
+        }
+        
+        /* DAYS LIST */
+        .days-list {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .days-list-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--txt);
+            margin-bottom: 12px;
+        }
+        .day-item {
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--grn);
+        }
+        .day-item-info {
+            flex: 1;
+        }
+        .day-item-date {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--txt);
+        }
+        .day-item-time {
+            font-size: 12px;
+            color: var(--sub);
+            margin-top: 2px;
+        }
+        .day-item-value {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--grn);
+        }
+        
+        /* FOOTER */
         .footer {
             display: flex;
             gap: 10px;
@@ -183,7 +325,7 @@
             background: white;
             border-top: 1px solid #e0e0e0;
         }
-        .btn {
+        .btn-footer {
             flex: 1;
             padding: 12px;
             border: none;
@@ -197,26 +339,14 @@
             background: #e91e63;
             color: white;
         }
-        .btn-janine:active {
-            background: #c2185b;
-        }
         .btn-teilen {
             background: var(--grn);
             color: white;
             flex: 2;
         }
-        .btn-teilen:active {
-            background: #1a5c2a;
-        }
         .btn-save {
             background: var(--grn);
             color: white;
-            flex: 1;
-        }
-        .btn-print {
-            background: var(--grn);
-            color: white;
-            flex: 1;
         }
     </style>
 </head>
@@ -225,29 +355,80 @@
         <div class="header-app">STUNDENZETTEL</div>
         <div class="header-name" id="userName">Mitarbeiter</div>
         <div class="header-info">
-            <div id="weekHours">31 Std. / Woche</div>
+            <div class="header-badge" id="weekHours">31 Std. / Woche</div>
             <div class="header-saldo" id="saldo">Saldo: +0,00h</div>
         </div>
     </div>
 
-    <div class="container" id="content"></div>
+    <div class="month-nav">
+        <button class="month-nav-btn" onclick="prevMonth()">‹</button>
+        <div class="month-title" id="monthTitle">Juni 2026</div>
+        <button class="month-nav-btn" onclick="nextMonth()">›</button>
+    </div>
+
+    <div class="container">
+        <!-- HEUTE CARD -->
+        <div class="today-card">
+            <div class="today-label">HEUTE</div>
+            
+            <div class="today-header">
+                <div class="today-dayinfo">
+                    <div class="today-day" id="todayDay">Mi, 3. Juni</div>
+                    <div class="today-time" id="todayTime">8:00–13:30</div>
+                </div>
+                <div class="today-hours-display">
+                    <div class="today-hours" id="todayHours">5,30</div>
+                    <div class="today-hours-label">Std.</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 50%"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn-ctrl btn-minus" onclick="addHours(-0.25)">−</button>
+                <button class="btn-ctrl btn-plus" onclick="addHours(+0.25)">+</button>
+                <div style="flex: 1;"></div>
+                <span id="statusLabel" style="display: none; align-self: center; font-weight: 600; color: var(--grn); font-size: 12px;">✓ genau</span>
+            </div>
+
+            <div class="status-buttons">
+                <button class="btn-status" onclick="setStatus('normal')" id="btn-normal">Normal</button>
+                <button class="btn-status" onclick="setStatus('frei')" id="btn-frei">⭐ Frei</button>
+                <button class="btn-status" onclick="setStatus('krank')" id="btn-krank">😷 Krank</button>
+                <button class="btn-status" onclick="setStatus('schule')" id="btn-schule">🚫 Schule</button>
+            </div>
+
+            <div class="notes-section">
+                <div class="notes-label">Bemerkungen</div>
+                <textarea class="notes-input" id="notesInput" placeholder="Notizen zu diesem Tag..." onchange="saveNotes()"></textarea>
+            </div>
+        </div>
+
+        <!-- DAYS LIST -->
+        <div class="days-list">
+            <div class="days-list-title">Alle Tage</div>
+            <div id="daysList"></div>
+        </div>
+    </div>
 
     <div class="footer">
-        <button class="btn btn-janine" onclick="saveJanine()">👤 Janine</button>
-        <button class="btn btn-teilen" onclick="openShare()">📤 Teilen</button>
-        <button class="btn btn-save" onclick="save()">💾</button>
-        <button class="btn btn-print" onclick="print()">🖨️</button>
+        <button class="btn-footer btn-janine" onclick="saveJanine()">👤 Janine</button>
+        <button class="btn-footer btn-teilen" onclick="openShare()">📤 Teilen</button>
+        <button class="btn-footer btn-save" onclick="save()">💾</button>
     </div>
 
     <script>
         // ============= GLOBALS =============
-        let PLAN = {};
         let userData = null;
-        let entries = {}; // { "2026-06-03": 7.5, ... }
+        let entries = {}; // { "2026-06-03": { hours: 7.5, status: "normal", notes: "..." }, ... }
+        let PLAN = {};
+        let currentDate = new Date();
+        let todayValue = 0;
 
-        // ============= LOAD DATA =============
+        // ============= INIT =============
         function init() {
-            // Lade letzten Mitarbeiter
             const names = Object.keys(localStorage).filter(k => k.startsWith('stundenzettel_'));
             if (names.length === 0) {
                 window.location.href = 'index.html';
@@ -257,10 +438,8 @@
             userData = JSON.parse(localStorage.getItem(names[names.length - 1]));
             entries = userData.eintraege || {};
             
-            // Baue PLAN aus eingegebenen Daten
             buildPlan();
             
-            // Zeige Daten
             const displayName = userData.name
                 .split('_')
                 .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
@@ -269,10 +448,8 @@
             document.getElementById('userName').textContent = displayName;
             document.getElementById('weekHours').textContent = userData.wochenstunden + ' Std. / Woche';
             
-            // TODO: Saldo vom Vormonat laden (für jetzt: 0)
-            document.getElementById('saldo').textContent = 'Saldo: +0,00h';
-            
-            renderContent();
+            currentDate = new Date();
+            render();
         }
 
         function buildPlan() {
@@ -299,109 +476,145 @@
             });
         }
 
-        function renderContent() {
-            const months = {};
-            const now = new Date();
-            const currentMonth = now.getMonth();
-            const currentYear = now.getFullYear();
-
-            // Sammle Einträge nach Monat
-            Object.entries(entries).forEach(([dateStr, hours]) => {
-                const date = new Date(dateStr);
-                const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                if (!months[key]) months[key] = [];
-                months[key].push({ date: dateStr, hours, dow: date.getDay() });
-            });
-
-            // Generiere Wochen aus PLAN (auch ohne Einträge)
-            const allDates = new Set(Object.keys(entries));
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        function render() {
+            // Render HEUTE
+            const today = currentDate.toISOString().split('T')[0];
+            const dayOfWeek = currentDate.getDay();
+            const planDay = PLAN[dayOfWeek] || PLAN[dayOfWeek === 0 ? 7 : dayOfWeek];
             
-            for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
-                const dateStr = d.toISOString().split('T')[0];
-                if (!allDates.has(dateStr)) {
-                    allDates.add(dateStr);
-                    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-                    if (!months[key]) months[key] = [];
-                    months[key].push({ date: dateStr, hours: 0, dow: d.getDay() });
-                }
+            const dayName = currentDate.toLocaleDateString('de-DE', { weekday: 'short' });
+            const dayNum = currentDate.getDate();
+            const monthName = currentDate.toLocaleDateString('de-DE', { month: 'long' });
+            
+            document.getElementById('todayDay').textContent = `${dayName.charAt(0).toUpperCase() + dayName.slice(1)}, ${dayNum}. ${monthName}`;
+            
+            if (planDay) {
+                document.getElementById('todayTime').textContent = `${planDay.von}–${planDay.bis}`;
+                todayValue = planDay.soll;
+            } else {
+                document.getElementById('todayTime').textContent = '–:–';
+                todayValue = 0;
             }
 
-            let html = '';
+            // Lade Entry für heute
+            if (!entries[today]) {
+                entries[today] = { hours: todayValue, status: 'normal', notes: '' };
+            }
+
+            const entry = entries[today];
+            todayValue = entry.hours || todayValue;
             
-            // Render nach Monat
-            Object.keys(months).sort().reverse().forEach(monthKey => {
-                const [year, month] = monthKey.split('-');
-                const monthDate = new Date(year, parseInt(month) - 1);
-                const monthName = monthDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
-                
-                html += `<div class="month-section">
-                    <div class="month-title">${monthName}</div>`;
-                
-                // Gruppiere nach Woche
-                const weeks = {};
-                months[monthKey].forEach(entry => {
-                    const date = new Date(entry.date);
-                    const weekStart = new Date(date);
-                    weekStart.setDate(date.getDate() - date.getDay() + 1); // Mo
-                    const weekKey = weekStart.toISOString().split('T')[0];
-                    
-                    if (!weeks[weekKey]) weeks[weekKey] = [];
-                    weeks[weekKey].push(entry);
-                });
-                
-                // Render Wochen
-                Object.keys(weeks).sort().forEach(weekKey => {
-                    const weekStart = new Date(weekKey);
-                    const weekNum = Math.ceil((weekStart.getDate() + new Date(weekStart.getFullYear(), weekStart.getMonth(), 1).getDay()) / 7);
-                    
-                    html += `<div class="week-section">
-                        <div class="week-title">KW ${String(weekNum).padStart(2, '0')}</div>`;
-                    
-                    weeks[weekKey].sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(entry => {
-                        const date = new Date(entry.date);
-                        const dayName = date.toLocaleDateString('de-DE', { weekday: 'short' });
-                        const dayNum = String(date.getDate()).padStart(2, '0');
-                        const dow = date.getDay();
-                        const planDay = PLAN[dow] || PLAN[dow === 0 ? 7 : dow];
-                        const time = planDay ? `${planDay.von}–${planDay.bis}` : '–:–';
-                        
-                        html += `<div class="day-entry">
-                            <div class="day-info">
-                                <div class="day-label">${dayName}</div>
-                                <div class="day-date">${dayNum}.${String(date.getMonth() + 1).padStart(2, '0')}.</div>
-                                <div class="day-time">${time}</div>
-                            </div>
-                            <div class="day-value" id="val-${entry.date}">${formatHours(entry.hours)}</div>
-                            <div class="day-controls">
-                                <button class="btn-ctrl btn-minus" onclick="addHours('${entry.date}', -0.25)">−</button>
-                                <button class="btn-ctrl btn-plus" onclick="addHours('${entry.date}', +0.25)">+</button>
-                            </div>
-                        </div>`;
-                    });
-                    
-                    html += `</div>`;
-                });
-                
-                html += `</div>`;
-            });
+            updateTodayDisplay();
+            updateStatusButtons(entry.status);
+            document.getElementById('notesInput').value = entry.notes || '';
             
-            document.getElementById('content').innerHTML = html;
+            // Render Monat Title
+            document.getElementById('monthTitle').textContent = 
+                currentDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+            
+            // Render Days List
+            renderDaysList();
         }
 
-        function formatHours(h) {
-            const sign = h < 0 ? '−' : '+';
-            const abs = Math.abs(h);
+        function updateTodayDisplay() {
+            const sign = todayValue < 0 ? '−' : '';
+            const abs = Math.abs(todayValue);
             const hours = Math.floor(abs);
             const mins = Math.round((abs - hours) * 60);
-            return `${sign}${hours},${String(mins).padStart(2, '0')}`;
+            
+            document.getElementById('todayHours').textContent = `${sign}${hours},${String(mins).padStart(2, '0')}`;
+            
+            // Progress Bar
+            const maxHours = userData.wochenstunden / 5; // Durchschnitt pro Tag
+            const percent = Math.min(100, (todayValue / maxHours) * 100);
+            document.getElementById('progressFill').style.width = percent + '%';
         }
 
-        function addHours(dateStr, delta) {
-            if (!entries[dateStr]) entries[dateStr] = 0;
-            entries[dateStr] = Math.round((entries[dateStr] + delta) * 100) / 100;
-            document.getElementById(`val-${dateStr}`).textContent = formatHours(entries[dateStr]);
+        function addHours(delta) {
+            todayValue = Math.round((todayValue + delta) * 100) / 100;
+            updateTodayDisplay();
+            saveEntry();
+        }
+
+        function setStatus(status) {
+            const today = currentDate.toISOString().split('T')[0];
+            if (!entries[today]) entries[today] = { hours: todayValue, status, notes: '' };
+            
+            entries[today].status = status;
+            
+            // Logik für Status
+            if (status === 'frei' || status === 'schule') {
+                todayValue = -Math.abs(todayValue);
+            } else if (status === 'krank') {
+                // Stunden bleiben wie sie sind
+            } else {
+                todayValue = Math.abs(todayValue);
+            }
+            
+            entries[today].hours = todayValue;
+            updateTodayDisplay();
+            updateStatusButtons(status);
+            saveEntry();
+        }
+
+        function updateStatusButtons(status) {
+            document.getElementById('btn-normal').classList.toggle('active', status === 'normal');
+            document.getElementById('btn-frei').classList.toggle('active', status === 'frei');
+            document.getElementById('btn-krank').classList.toggle('active', status === 'krank');
+            document.getElementById('btn-schule').classList.toggle('active', status === 'schule');
+        }
+
+        function saveNotes() {
+            const today = currentDate.toISOString().split('T')[0];
+            if (!entries[today]) entries[today] = { hours: todayValue, status: 'normal', notes: '' };
+            entries[today].notes = document.getElementById('notesInput').value;
+            saveEntry();
+        }
+
+        function saveEntry() {
+            const today = currentDate.toISOString().split('T')[0];
+            entries[today] = entries[today] || { hours: todayValue, status: 'normal', notes: '' };
+            entries[today].hours = todayValue;
+        }
+
+        function renderDaysList() {
+            const html = Object.entries(entries)
+                .sort(([a], [b]) => new Date(b) - new Date(a))
+                .slice(0, 20) // Letzte 20 Tage
+                .map(([dateStr, entry]) => {
+                    const date = new Date(dateStr);
+                    const dayName = date.toLocaleDateString('de-DE', { weekday: 'short' });
+                    const dayNum = String(date.getDate()).padStart(2, '0');
+                    const dow = date.getDay();
+                    const planDay = PLAN[dow];
+                    const time = planDay ? `${planDay.von}–${planDay.bis}` : '–:–';
+                    
+                    const sign = entry.hours < 0 ? '−' : '+';
+                    const abs = Math.abs(entry.hours);
+                    const hours = Math.floor(abs);
+                    const mins = Math.round((abs - hours) * 60);
+                    
+                    return `<div class="day-item">
+                        <div class="day-item-info">
+                            <div class="day-item-date">${dayName.charAt(0).toUpperCase() + dayName.slice(1)}, ${dayNum}.</div>
+                            <div class="day-item-time">${time}</div>
+                        </div>
+                        <div class="day-item-value">${sign}${hours},${String(mins).padStart(2, '0')}</div>
+                    </div>`;
+                })
+                .join('');
+            
+            document.getElementById('daysList').innerHTML = html || '<p style="color: var(--sub); font-size: 13px;">Noch keine Einträge</p>';
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            render();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            render();
         }
 
         function save() {
@@ -412,17 +625,23 @@
         }
 
         function openShare() {
-            const text = `Stundenzettel ${new Date().toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}:\n${Object.entries(entries).map(([d, h]) => `${d}: ${formatHours(h)}`).join('\n')}`;
+            const text = `Stundenzettel ${currentDate.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}:\n${Object.entries(entries).map(([d, e]) => {
+                const sign = e.hours < 0 ? '−' : '+';
+                const abs = Math.abs(e.hours);
+                const hours = Math.floor(abs);
+                const mins = Math.round((abs - hours) * 60);
+                return `${d}: ${sign}${hours},${String(mins).padStart(2, '0')}`;
+            }).join('\n')}`;
             
             if (navigator.share) {
                 navigator.share({ title: 'Stundenzettel', text });
             } else {
-                alert('Teilen nicht unterstützt. Text: \n' + text);
+                alert('Teilen nicht unterstützt.');
             }
         }
 
         function saveJanine() {
-            alert('👍 Janine hat\'s bekommen!\n\nWird zum Dashboard weitergeleitet...');
+            alert('👍 Janine hat\'s bekommen!');
             const janinData = {
                 name: 'Janine',
                 wochenstunden: 31,
@@ -439,10 +658,6 @@
             localStorage.setItem('stundenzettel_JANINE', JSON.stringify(janinData));
             sessionStorage.setItem('admin_authenticated', 'true');
             window.location.href = 'dashboard.html';
-        }
-
-        function print() {
-            window.print();
         }
 
         // INIT
