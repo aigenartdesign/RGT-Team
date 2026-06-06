@@ -2,407 +2,304 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <meta name="cache-control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="expires" content="0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Stundenzettel Setup">
     <title>Stundenzettel – Setup</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4f9ff0;
+            --primary-dark: #357abd;
+            --txt: #1a1a1a;
+            --sub: #666;
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --border: #e8eef5;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #4f9ff0 0%, #357abd 100%);
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fb 0%, #e8f0ff 100%);
+            color: var(--txt);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
+        
         .container {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(79, 159, 240, 0.15);
+            max-width: 500px;
             width: 100%;
-            max-width: 520px;
-            background: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(53, 122, 189, 0.15);
-            padding: 48px 32px;
-            animation: slideUp 0.6s ease-out;
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .progress-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 32px;
-            justify-content: center;
-        }
-        .progress-step {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #e8eef5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            color: #999;
-            transition: all 0.3s ease;
-        }
-        .progress-step.active {
-            background: linear-gradient(135deg, #4f9ff0 0%, #357abd 100%);
-            color: white;
-            transform: scale(1.1);
-        }
-        .progress-step.completed {
-            background: #4f9ff0;
-            color: white;
-        }
+        
         .header {
             text-align: center;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
-        .emoji { font-size: 48px; margin-bottom: 16px; }
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 8px;
-        }
-        .header p {
-            font-size: 14px;
-            color: #888;
-        }
-        .step { display: none; }
-        .step.active { display: block; animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .form-group { margin-bottom: 24px; }
-        .form-group label {
-            display: flex;
-            align-items: center;
-            font-weight: 600;
-            font-size: 13px;
-            color: #357abd;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            gap: 8px;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e8eef5;
-            border-radius: 14px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 15px;
-            color: #1a1a1a;
-            background: #f9fbfd;
-            transition: all 0.3s ease;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: #4f9ff0;
-            background: white;
-            box-shadow: 0 4px 16px rgba(79, 159, 240, 0.1);
-        }
-        .info-box {
-            background: linear-gradient(135deg, #f9fbfd 0%, #f0f6fc 100%);
-            border: 1px solid #e8eef5;
-            border-radius: 14px;
-            padding: 14px 16px;
-            margin-bottom: 8px;
-            font-size: 13px;
-            color: #666;
-        }
-        .info-box strong { color: #357abd; font-weight: 600; }
-        .day-schedule {
-            background: #f9fbfd;
-            border: 1px solid #e8eef5;
-            border-radius: 14px;
-            padding: 16px;
+        
+        .logo {
+            font-size: 48px;
             margin-bottom: 16px;
         }
-        .day-title {
-            font-weight: 600;
-            color: #357abd;
-            margin-bottom: 12px;
+        
+        .title {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--txt);
+            margin-bottom: 8px;
         }
-        .time-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-        .time-input-group small {
-            display: block;
-            font-size: 11px;
-            color: #999;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-        .time-input-group input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e8eef5;
-            border-radius: 10px;
-            font-family: 'Poppins', sans-serif;
+        
+        .subtitle {
             font-size: 14px;
+            color: var(--sub);
+        }
+        
+        .step {
+            margin-bottom: 32px;
+        }
+        
+        .step-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            background: var(--bg);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        input[type="time"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Poppins', inherit;
+            font-size: 14px;
+            color: var(--txt);
             background: white;
-            text-align: center;
         }
-        .time-input-group input:focus {
+        
+        input:focus,
+        select:focus {
             outline: none;
-            border-color: #4f9ff0;
-            box-shadow: 0 2px 8px rgba(79, 159, 240, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 159, 240, 0.1);
         }
-        .team-checkbox {
+        
+        .day-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            align-items: end;
+            margin-bottom: 12px;
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        
+        .day-row input {
+            margin: 0;
+        }
+        
+        .checkbox-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
             cursor: pointer;
         }
-        .team-checkbox input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+        
+        .checkbox-label {
+            font-size: 14px;
+            color: var(--txt);
             cursor: pointer;
-            accent-color: #4f9ff0;
-        }
-        .button-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 32px;
-        }
-        .button-group button {
             flex: 1;
-            padding: 14px 24px;
+        }
+        
+        .button {
+            width: 100%;
+            padding: 14px;
             border: none;
-            border-radius: 14px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 15px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
+        
         .btn-primary {
-            background: linear-gradient(135deg, #4f9ff0 0%, #357abd 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            box-shadow: 0 8px 24px rgba(79, 159, 240, 0.3);
         }
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(79, 159, 240, 0.4);
+        
+        .btn-primary:active {
+            transform: scale(0.98);
         }
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .btn-secondary {
-            background: #f0f6fc;
-            color: #357abd;
-            border: 2px solid #e8eef5;
-        }
-        .btn-secondary:hover {
-            background: #e8eef5;
-        }
-        .footer-note {
-            text-align: center;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid #e8eef5;
-            font-size: 12px;
-            color: #999;
-        }
-        @media (max-width: 480px) {
-            .container { padding: 32px 24px; }
-            .header h1 { font-size: 24px; }
-            .button-group { flex-direction: column; }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--txt);
+            margin-bottom: 16px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="progress-bar">
-            <div class="progress-step active" id="progressStep1">1</div>
-            <div class="progress-step" id="progressStep2">2</div>
+        <div class="header">
+            <div class="logo">📋</div>
+            <div class="title">Stundenzettel</div>
+            <div class="subtitle">Schnelle Einrichtung</div>
         </div>
 
-        <div class="step active" id="step1">
-            <div class="header">
-                <div class="emoji">👋</div>
-                <h1>Neue Person</h1>
-                <p>Lass uns einrichten</p>
+        <!-- SCHRITT 1 -->
+        <div class="step">
+            <div class="step-label">Schritt 1 von 2</div>
+            <div class="step-title">Deine Angaben</div>
+            
+            <div class="form-group">
+                <label class="form-label">Name</label>
+                <input type="text" id="nameInput" placeholder="z.B. Renate Brückers" value="">
             </div>
-
-            <form id="form1">
-                <div class="form-group">
-                    <label for="name"><span>👤</span> Name</label>
-                    <input type="text" id="name" placeholder="z.B. Adam Riese" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="hours"><span>📊</span> Wochenstunden</label>
-                    <input type="number" id="hours" placeholder="z.B. 31" min="0" max="99" step="0.5" required>
-                    <div class="info-box"><strong>Tipp:</strong> Geplante Arbeitsstunden pro Woche</div>
-                </div>
-
-                <div class="button-group">
-                    <button type="button" class="btn-secondary" onclick="goBack()">← Abbrechen</button>
-                    <button type="submit" class="btn-primary">Weiter →</button>
-                </div>
-            </form>
-        </div>
-
-        <div class="step" id="step2">
-            <div class="header">
-                <div class="emoji">📅</div>
-                <h1>Stundenplan</h1>
-                <p>Arbeitszeiten pro Woche</p>
+            
+            <div class="form-group">
+                <label class="form-label">Wochenstunden</label>
+                <input type="number" id="hoursInput" placeholder="z.B. 31" value="31" min="0" step="0.5">
             </div>
-
-            <form id="form2">
-                <div id="scheduleContainer"></div>
-
-                <div class="info-box"><strong>📌 Team:</strong> Mit Haken = +1h zur geplanten Zeit</div>
-
-                <div class="button-group">
-                    <button type="button" class="btn-secondary" onclick="goBackToStep1()">← Zurück</button>
-                    <button type="submit" class="btn-primary">Speichern & Fertig ✓</button>
-                </div>
-            </form>
         </div>
 
-        <div class="footer-note">💾 Speichert lokal auf diesem Gerät</div>
+        <!-- SCHRITT 2 -->
+        <div class="step">
+            <div class="step-label">Schritt 2 von 2</div>
+            <div class="step-title">Dein Stundenplan (Mo–Fr)</div>
+            
+            <div id="scheduleContainer">
+                <!-- Wird mit JS gefüllt -->
+            </div>
+        </div>
+
+        <!-- BUTTON -->
+        <button class="button btn-primary" onclick="saveSetup()">Speichern & Fertig ✓</button>
     </div>
 
     <script>
-        const days = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
-
-        window.addEventListener('DOMContentLoaded', () => {
-            renderSchedule();
-        });
-
-        function renderSchedule() {
-            const container = document.getElementById('scheduleContainer');
-            if (!container) return;
+        const DAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
+        
+        // Standard-Uhrzeiten
+        const DEFAULTS = {
+            'Montag': { von: '08:00', bis: '15:00' },
+            'Dienstag': { von: '08:00', bis: '15:00' },
+            'Mittwoch': { von: '08:00', bis: '15:00' },
+            'Donnerstag': { von: '08:00', bis: '15:00' },
+            'Freitag': { von: '08:00', bis: '15:00' }
+        };
+        
+        function init() {
+            // Lade eventuell gespeicherte Daten
+            const names = Object.keys(localStorage).filter(k => k.startsWith('stundenzettel_'));
+            if (names.length > 0) {
+                const lastData = JSON.parse(localStorage.getItem(names[names.length - 1]));
+                document.getElementById('nameInput').value = lastData.name.replace(/_/g, ' ');
+                document.getElementById('hoursInput').value = lastData.wochenstunden;
+            }
             
-            container.innerHTML = '';
-            days.forEach(day => {
-                const dayHtml = `
-                    <div class="day-schedule">
-                        <div class="day-title">${day}</div>
-                        <div class="time-row">
-                            <div class="time-input-group">
-                                <small>⏰ Von</small>
-                                <input type="time" id="${day}_von" value="07:30">
-                            </div>
-                            <div class="time-input-group">
-                                <small>⏰ Bis</small>
-                                <input type="time" id="${day}_bis" value="15:00">
-                            </div>
+            renderSchedule();
+        }
+        
+        function renderSchedule() {
+            const html = DAYS.map(day => {
+                const defaults = DEFAULTS[day];
+                return `
+                    <div class="form-group">
+                        <label class="form-label">${day}</label>
+                        <div class="day-row">
+                            <input type="time" id="von-${day}" value="${defaults.von}" required>
+                            <span style="text-align: center; color: var(--sub);">–</span>
+                            <input type="time" id="bis-${day}" value="${defaults.bis}" required>
                         </div>
-                        <div class="team-checkbox">
-                            <input type="checkbox" id="${day}_team">
-                            <label for="${day}_team">💬 Team-Besprechung</label>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="team-${day}">
+                            <label class="checkbox-label" for="team-${day}">Team-Besprechung (+1h)</label>
                         </div>
                     </div>
                 `;
-                container.innerHTML += dayHtml;
-            });
-        }
-
-        document.getElementById('form1').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('name').value.trim();
-            const hours = parseFloat(document.getElementById('hours').value);
-
-            if (!name || !hours) {
-                alert('Bitte ausfüllen!');
-                return;
-            }
-
-            sessionStorage.setItem('temp_name', name);
-            sessionStorage.setItem('temp_hours', hours);
-            goToStep2();
-        });
-
-        // DIREKTER BUTTON-CLICK statt Form Submit
-        const saveBtn = document.querySelector('form#form2 .btn-primary');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                
-                try {
-                    const name = sessionStorage.getItem('temp_name');
-                    const hours = parseFloat(sessionStorage.getItem('temp_hours'));
-
-                    if (!name || !hours) {
-                        alert('Fehler: Bitte von vorne beginnen.');
-                        return;
-                    }
-
-                    const schedule = [];
-                    days.forEach(day => {
-                        const von = document.getElementById(`${day}_von`);
-                        const bis = document.getElementById(`${day}_bis`);
-                        const team = document.getElementById(`${day}_team`);
-                        
-                        if (von && bis && team) {
-                            schedule.push({ day, von: von.value, bis: bis.value, team: team.checked });
-                        }
-                    });
-
-                    const key = `stundenzettel_${name.replace(/\s+/g, '_').toUpperCase()}`;
-                    const userData = {
-                        name, wochenstunden: hours, schedule, eintraege: [],
-                        erstellt: new Date().toISOString()
-                    };
-
-                    localStorage.setItem(key, JSON.stringify(userData));
-                    sessionStorage.setItem('current_user', name.replace(/\s+/g, '_').toUpperCase());
-
-                    saveBtn.textContent = '✓ Gespeichert!';
-                    saveBtn.disabled = true;
-
-                    // DIREKT zur worker.html - OHNE setTimeout!
-                    console.log('📤 Leite weiter zu worker.html...');
-                    setTimeout(() => {
-                        window.location.href = 'worker.html';
-                    }, 500);
-                    
-                } catch (err) {
-                    console.error('❌ Fehler:', err);
-                    alert('Fehler beim Speichern: ' + err.message);
-                }
-            });
+            }).join('');
+            
+            document.getElementById('scheduleContainer').innerHTML = html;
         }
         
-        document.getElementById('form2').addEventListener('submit', (e) => {
-            e.preventDefault();
-        });
-
-        function goToStep2() {
-            document.getElementById('step1').classList.remove('active');
-            document.getElementById('step2').classList.add('active');
-            document.getElementById('progressStep1').classList.add('completed');
-            document.getElementById('progressStep1').classList.remove('active');
-            document.getElementById('progressStep2').classList.add('active');
+        function saveSetup() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (!name) {
+                alert('Bitte gib deinen Namen ein!');
+                return;
+            }
+            
+            const wochenstunden = parseFloat(document.getElementById('hoursInput').value) || 31;
+            
+            const schedule = DAYS.map(day => ({
+                day: day,
+                von: document.getElementById(`von-${day}`).value,
+                bis: document.getElementById(`bis-${day}`).value,
+                team: document.getElementById(`team-${day}`).checked
+            }));
+            
+            const userData = {
+                name: name.replace(/\s+/g, '_').toUpperCase(),
+                wochenstunden: wochenstunden,
+                schedule: schedule,
+                eintraege: {},
+                erstellt: new Date().toISOString()
+            };
+            
+            // Speichere in localStorage
+            const key = `stundenzettel_${userData.name}`;
+            localStorage.setItem(key, JSON.stringify(userData));
+            
+            // Speichere aktuellen Benutzer in sessionStorage
+            sessionStorage.setItem('current_user', userData.name);
+            
+            alert('✓ Gespeichert!');
+            window.location.href = 'worker.html';
         }
-
-        function goBackToStep1() {
-            document.getElementById('step2').classList.remove('active');
-            document.getElementById('step1').classList.add('active');
-            document.getElementById('progressStep2').classList.remove('active');
-            document.getElementById('progressStep1').classList.remove('completed');
-            document.getElementById('progressStep1').classList.add('active');
-        }
-
-        function goBack() {
-            sessionStorage.clear();
-            window.location.href = 'index.html';
-        }
+        
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
