@@ -21,7 +21,6 @@
             --txt: #0d1f10;
             --sub: #5a7a5e;
             --red: #d93025;
-            --ora: #e07b00;
             --grn-light: #d4f5d4;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -61,7 +60,6 @@
             gap: 12px;
             font-size: 12px;
             opacity: 0.85;
-            margin-bottom: 4px;
         }
         .header-badge {
             background: rgba(255,255,255,0.15);
@@ -69,15 +67,7 @@
             border-radius: 99px;
             border: 1px solid rgba(255,255,255,0.25);
         }
-        .header-saldo {
-            background: rgba(255,255,255,0.15);
-            padding: 8px 16px;
-            border-radius: 99px;
-            font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.25);
-        }
         
-        /* SAVE INDICATOR */
         .save-indicator {
             position: absolute;
             top: 12px;
@@ -90,7 +80,6 @@
             font-weight: 700;
             opacity: 0;
             transition: opacity 0.3s;
-            pointer-events: none;
         }
         .save-indicator.show {
             opacity: 1;
@@ -125,7 +114,7 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
         .today-dayinfo {
             flex: 1;
@@ -160,7 +149,7 @@
             background: #e0e0e0;
             height: 8px;
             border-radius: 4px;
-            margin: 12px 0;
+            margin-bottom: 20px;
             overflow: hidden;
         }
         .progress-fill {
@@ -170,24 +159,29 @@
             transition: width 0.3s;
         }
         
-        /* BUTTONS */
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
+        /* CONTROLS - ZENTRAL */
+        .controls-section {
+            text-align: center;
+            margin-bottom: 20px;
         }
-        .btn-ctrl {
-            width: 44px;
-            height: 44px;
+        .btn-large-group {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .btn-ctrl-large {
+            width: 56px;
+            height: 56px;
             border: none;
             border-radius: 50%;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
             font-weight: 700;
+            transition: all 0.2s;
             flex-shrink: 0;
         }
         .btn-minus {
@@ -196,6 +190,7 @@
         }
         .btn-minus:active {
             background: #ef9a9a;
+            transform: scale(0.95);
         }
         .btn-plus {
             background: var(--grn-light);
@@ -203,40 +198,46 @@
         }
         .btn-plus:active {
             background: #a8e6a8;
+            transform: scale(0.95);
         }
+        
         .btn-today {
             background: #e3f2fd;
             color: #1976d2;
-            flex: 1;
-            margin-left: auto;
+            border: 2px solid #1976d2;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
         .btn-today:active {
-            background: #bbdefb;
+            background: #1976d2;
+            color: white;
         }
         
         /* STATUS BUTTONS */
         .status-buttons {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 8px;
-            margin-bottom: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
+            margin-bottom: 16px;
         }
         .btn-status {
-            width: 44px;
-            height: 44px;
-            padding: 0;
+            padding: 10px;
             border: 2px solid #ddd;
             border-radius: 12px;
             background: white;
             color: var(--txt);
             font-weight: 600;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
+            aspect-ratio: 1;
         }
         .btn-status:active {
             background: var(--grn-light);
@@ -249,7 +250,7 @@
         
         /* BEMERKUNGEN */
         .notes-section {
-            margin-top: 12px;
+            margin-bottom: 16px;
         }
         .notes-label {
             font-size: 12px;
@@ -269,9 +270,6 @@
             color: var(--txt);
             resize: none;
             height: 60px;
-        }
-        .notes-input::placeholder {
-            color: var(--sub);
         }
         
         /* MODAL */
@@ -317,12 +315,10 @@
             color: var(--sub);
         }
         
-        /* CALENDAR IN MODAL */
         .month-nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: var(--txt);
             padding: 12px 0;
             margin-bottom: 16px;
         }
@@ -360,9 +356,8 @@
             font-weight: 700;
             font-size: 12px;
             color: var(--sub);
-            padding: 8px 4px;
+            padding: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         .calendar-grid {
             display: grid;
@@ -422,6 +417,10 @@
             cursor: pointer;
             transition: all 0.2s;
         }
+        .btn-kalender {
+            background: var(--grn);
+            color: white;
+        }
         .btn-janine {
             background: #e91e63;
             color: white;
@@ -437,10 +436,6 @@
             background: var(--grn);
             color: white;
         }
-        .btn-kalender {
-            background: var(--grn);
-            color: white;
-        }
     </style>
 </head>
 <body>
@@ -449,13 +444,11 @@
         <div class="header-name" id="userName">Mitarbeiter</div>
         <div class="header-info">
             <div class="header-badge" id="weekHours">31 Std. / Woche</div>
-            <div class="header-saldo" id="saldo">Saldo: +0,00h</div>
         </div>
         <div class="save-indicator" id="saveIndicator">✓ Gespeichert</div>
     </div>
 
     <div class="container">
-        <!-- HEUTE CARD -->
         <div class="today-card">
             <div class="today-label">HEUTE</div>
             
@@ -474,10 +467,12 @@
                 <div class="progress-fill" id="progressFill" style="width: 50%"></div>
             </div>
 
-            <div class="controls">
-                <button class="btn-ctrl btn-minus" onclick="addHours(-0.25)">−</button>
-                <button class="btn-ctrl btn-plus" onclick="addHours(+0.25)">+</button>
-                <button class="btn-ctrl btn-today" onclick="backToToday()" title="Zurück zu heute">📅</button>
+            <div class="controls-section">
+                <div class="btn-large-group">
+                    <button class="btn-ctrl-large btn-minus" onclick="addHours(-0.25)">−</button>
+                    <button class="btn-ctrl-large btn-plus" onclick="addHours(+0.25)">+</button>
+                </div>
+                <button class="btn-today" onclick="backToToday()">🏠 Heute</button>
             </div>
 
             <div class="status-buttons">
@@ -520,8 +515,8 @@
     </div>
 
     <div class="footer">
-        <button class="btn-footer btn-kalender" onclick="openCalendar()">📅</button>
-        <button class="btn-footer btn-janine" onclick="saveJanine()" title="An Janine senden">✉️</button>
+        <button class="btn-footer btn-kalender" onclick="openCalendar()">📅 Kalender</button>
+        <button class="btn-footer btn-janine" onclick="saveJanine()">✉️</button>
         <button class="btn-footer btn-teilen" onclick="openShare()">📤</button>
         <button class="btn-footer btn-save" onclick="manualSave()">💾</button>
     </div>
@@ -536,9 +531,11 @@
         let saveTimeout = null;
 
         function init() {
-            let userName = sessionStorage.getItem('current_user');
+            // WICHTIG: Lade aktuellen Benutzer von localStorage
+            let userName = localStorage.getItem('last_stundenzettel_user');
             
             if (!userName) {
+                // Fallback: letzte Person
                 const names = Object.keys(localStorage).filter(k => k.startsWith('stundenzettel_'));
                 if (names.length === 0) {
                     window.location.href = 'index.html';
@@ -586,8 +583,7 @@
                         day: item.day,
                         von: item.von,
                         bis: item.bis,
-                        soll: Math.max(0, soll),
-                        team: item.team || false
+                        soll: Math.max(0, soll)
                     };
                 }
             });
@@ -817,8 +813,6 @@
             
             if (navigator.share) {
                 navigator.share({ title: 'Stundenzettel', text });
-            } else {
-                alert('Teilen nicht unterstützt.');
             }
         }
 
@@ -839,7 +833,6 @@
                 erstellt: new Date().toISOString()
             };
             localStorage.setItem('stundenzettel_JANINE', JSON.stringify(janinData));
-            sessionStorage.setItem('admin_authenticated', 'true');
             window.location.href = 'dashboard.html';
         }
 

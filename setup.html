@@ -221,7 +221,6 @@
     <script>
         const DAYS = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
         
-        // Standard-Uhrzeiten
         const DEFAULTS = {
             'Montag': { von: '08:00', bis: '15:00' },
             'Dienstag': { von: '08:00', bis: '15:00' },
@@ -231,12 +230,13 @@
         };
         
         function init() {
-            // Lade eventuell gespeicherte Daten
-            const names = Object.keys(localStorage).filter(k => k.startsWith('stundenzettel_'));
-            if (names.length > 0) {
-                const lastData = JSON.parse(localStorage.getItem(names[names.length - 1]));
-                document.getElementById('nameInput').value = lastData.name.replace(/_/g, ' ');
-                document.getElementById('hoursInput').value = lastData.wochenstunden;
+            const currentUser = localStorage.getItem('last_stundenzettel_user');
+            if (currentUser) {
+                const lastData = JSON.parse(localStorage.getItem(`stundenzettel_${currentUser}`));
+                if (lastData) {
+                    document.getElementById('nameInput').value = lastData.name.replace(/_/g, ' ');
+                    document.getElementById('hoursInput').value = lastData.wochenstunden;
+                }
             }
             
             renderSchedule();
@@ -288,12 +288,11 @@
                 erstellt: new Date().toISOString()
             };
             
-            // Speichere in localStorage
             const key = `stundenzettel_${userData.name}`;
             localStorage.setItem(key, JSON.stringify(userData));
             
-            // Speichere aktuellen Benutzer in sessionStorage
-            sessionStorage.setItem('current_user', userData.name);
+            // WICHTIG: Speichere den aktuellen Benutzer
+            localStorage.setItem('last_stundenzettel_user', userData.name);
             
             alert('✓ Gespeichert!');
             window.location.href = 'worker.html';
