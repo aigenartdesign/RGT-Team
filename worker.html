@@ -29,7 +29,7 @@
             background: var(--bg);
             color: var(--txt);
             padding: 0;
-            padding-bottom: 20px;
+            padding-bottom: 120px;
         }
         
         /* HEADER */
@@ -40,6 +40,43 @@
             color: white;
             position: relative;
         }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+        }
+        .btn-back:active {
+            background: rgba(255,255,255,0.3);
+        }
+        .save-indicator {
+            background: rgba(255,255,255,0.9);
+            color: var(--grn);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .save-indicator.show {
+            opacity: 1;
+        }
+        
         .header-app {
             font-size: 11px;
             font-weight: 600;
@@ -66,23 +103,6 @@
             padding: 6px 14px;
             border-radius: 99px;
             border: 1px solid rgba(255,255,255,0.25);
-        }
-        
-        .save-indicator {
-            position: absolute;
-            top: 12px;
-            right: 16px;
-            background: rgba(255,255,255,0.9);
-            color: var(--grn);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .save-indicator.show {
-            opacity: 1;
         }
         
         /* CONTENT */
@@ -133,7 +153,7 @@
             text-align: right;
         }
         .today-hours {
-            font-size: 48px;
+            font-size: 52px;
             font-weight: 900;
             color: var(--grn);
             line-height: 1;
@@ -159,18 +179,14 @@
             transition: width 0.3s;
         }
         
-        /* CONTROLS - ZENTRAL */
-        .controls-section {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .btn-large-group {
+        /* CONTROLS */
+        .controls {
             display: flex;
             justify-content: center;
             gap: 16px;
             margin-bottom: 16px;
         }
-        .btn-ctrl-large {
+        .btn-ctrl {
             width: 56px;
             height: 56px;
             border: none;
@@ -182,7 +198,6 @@
             justify-content: center;
             font-weight: 700;
             transition: all 0.2s;
-            flex-shrink: 0;
         }
         .btn-minus {
             background: #ffcdd2;
@@ -201,43 +216,27 @@
             transform: scale(0.95);
         }
         
-        .btn-today {
-            background: #e3f2fd;
-            color: #1976d2;
-            border: 2px solid #1976d2;
-            padding: 8px 16px;
-            border-radius: 20px;
+        /* STATUS BUTTONS - IN EINER LINIE */
+        .status-buttons {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-status {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: white;
+            color: var(--txt);
             font-weight: 600;
             font-size: 13px;
             cursor: pointer;
             transition: all 0.2s;
-        }
-        .btn-today:active {
-            background: #1976d2;
-            color: white;
-        }
-        
-        /* STATUS BUTTONS */
-        .status-buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        .btn-status {
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            background: white;
-            color: var(--txt);
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            aspect-ratio: 1;
+            flex: 1;
+            min-width: 70px;
+            text-align: center;
         }
         .btn-status:active {
             background: var(--grn-light);
@@ -357,7 +356,6 @@
             font-size: 12px;
             color: var(--sub);
             padding: 8px;
-            text-transform: uppercase;
         }
         .calendar-grid {
             display: grid;
@@ -392,7 +390,6 @@
         .calendar-day-value {
             font-size: 11px;
             margin-top: 2px;
-            font-weight: 600;
         }
         
         /* FOOTER */
@@ -425,8 +422,7 @@
             background: #e91e63;
             color: white;
             flex: 0.4;
-            font-size: 24px;
-            padding: 12px;
+            font-size: 20px;
         }
         .btn-teilen {
             background: var(--grn);
@@ -440,12 +436,17 @@
 </head>
 <body>
     <div class="header">
+        <div class="header-top">
+            <button class="btn-back" onclick="backToToday()" title="Zurück zu heute">🏠</button>
+            <div style="flex: 1;"></div>
+            <div class="save-indicator" id="saveIndicator">✓ Gespeichert</div>
+        </div>
+        
         <div class="header-app">STUNDENZETTEL</div>
         <div class="header-name" id="userName">Mitarbeiter</div>
         <div class="header-info">
             <div class="header-badge" id="weekHours">31 Std. / Woche</div>
         </div>
-        <div class="save-indicator" id="saveIndicator">✓ Gespeichert</div>
     </div>
 
     <div class="container">
@@ -467,19 +468,16 @@
                 <div class="progress-fill" id="progressFill" style="width: 50%"></div>
             </div>
 
-            <div class="controls-section">
-                <div class="btn-large-group">
-                    <button class="btn-ctrl-large btn-minus" onclick="addHours(-0.25)">−</button>
-                    <button class="btn-ctrl-large btn-plus" onclick="addHours(+0.25)">+</button>
-                </div>
-                <button class="btn-today" onclick="backToToday()">🏠 Heute</button>
+            <div class="controls">
+                <button class="btn-ctrl btn-minus" onclick="addHours(-0.25)">−</button>
+                <button class="btn-ctrl btn-plus" onclick="addHours(+0.25)">+</button>
             </div>
 
             <div class="status-buttons">
-                <button class="btn-status active" onclick="setStatus('normal')" id="btn-normal" title="Normal">✓</button>
-                <button class="btn-status" onclick="setStatus('frei')" id="btn-frei" title="Frei">⭐</button>
-                <button class="btn-status" onclick="setStatus('krank')" id="btn-krank" title="Krank">😷</button>
-                <button class="btn-status" onclick="setStatus('schule')" id="btn-schule" title="Schule">🚫</button>
+                <button class="btn-status active" onclick="setStatus('normal')" id="btn-normal">✓ Normal</button>
+                <button class="btn-status" onclick="setStatus('frei')" id="btn-frei">⭐ Frei</button>
+                <button class="btn-status" onclick="setStatus('krank')" id="btn-krank">😷 Krank</button>
+                <button class="btn-status" onclick="setStatus('schule')" id="btn-schule">🚫 Schule</button>
             </div>
 
             <div class="notes-section">
@@ -515,7 +513,7 @@
     </div>
 
     <div class="footer">
-        <button class="btn-footer btn-kalender" onclick="openCalendar()">📅 Kalender</button>
+        <button class="btn-footer btn-kalender" onclick="openCalendar()">📅</button>
         <button class="btn-footer btn-janine" onclick="saveJanine()">✉️</button>
         <button class="btn-footer btn-teilen" onclick="openShare()">📤</button>
         <button class="btn-footer btn-save" onclick="manualSave()">💾</button>
@@ -531,11 +529,9 @@
         let saveTimeout = null;
 
         function init() {
-            // WICHTIG: Lade aktuellen Benutzer von localStorage
             let userName = localStorage.getItem('last_stundenzettel_user');
             
             if (!userName) {
-                // Fallback: letzte Person
                 const names = Object.keys(localStorage).filter(k => k.startsWith('stundenzettel_'));
                 if (names.length === 0) {
                     window.location.href = 'index.html';
