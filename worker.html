@@ -577,7 +577,24 @@
         function calculateSaldo() {
             let total = 0;
             for (const dateStr in entries) {
-                total += (entries[dateStr].hours || 0);
+                const entry = entries[dateStr];
+                const date = new Date(dateStr + 'T00:00:00');
+                const dayOfWeek = date.getDay();
+                const planDay = PLAN[dayOfWeek] || PLAN[dayOfWeek === 0 ? 7 : dayOfWeek];
+                const soll = planDay ? planDay.soll : 0;
+                
+                // Berechne Differenz: Aktuell - Soll
+                let diff = entry.hours || 0;
+                
+                // Wenn Status "Schule" oder "Frei", dann ist es Minus (keine Arbeit)
+                // Aber wir verwenden die absolute Differenz
+                if (entry.status === 'schule' || entry.status === 'frei') {
+                    diff = -Math.abs(diff - soll);
+                } else {
+                    diff = diff - soll;
+                }
+                
+                total += diff;
             }
             return Math.round(total * 100) / 100;
         }
@@ -650,18 +667,9 @@
             const dateStr = formatDate(selectedDate);
             if (!entries[dateStr]) entries[dateStr] = { hours: todayValue, status, notes: '' };
             
+            // Speichere nur den Status, nicht die Stunden-Änderung
             entries[dateStr].status = status;
             
-            if (status === 'frei' || status === 'schule') {
-                todayValue = -Math.abs(todayValue);
-            } else if (status === 'krank') {
-                // Stunden bleiben
-            } else {
-                todayValue = Math.abs(todayValue);
-            }
-            
-            entries[dateStr].hours = todayValue;
-            updateTodayDisplay();
             updateStatusButtons(status);
             saveEntry();
             autoSave();
