@@ -193,7 +193,7 @@ body {
   <div class="header-name" id="userName">Marc Hoss</div>
   <div class="header-org">RGT · AWO</div>
   <div class="badges">
-    <div class="badge" id="weekHours">31 Std. / Woche</div>
+    <div class="badge" id="weekHours" onclick="openOverview()" style="cursor:pointer;">31 Std. / Woche</div>
     <div class="badge" id="saldoBadge">Saldo: +0h</div>
   </div>
 </div>
@@ -256,6 +256,18 @@ body {
 </div>
 
 <div class="toast" id="toast">Gespeichert ✓</div>
+
+<!-- ÜBERSICHT MODAL -->
+<div class="modal" id="overviewModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div class="modal-title">📊 Meine Übersicht</div>
+      <button class="btn-close" onclick="closeOverview()">✕</button>
+    </div>
+    <div id="overviewContent"></div>
+    <button class="btn-heute" onclick="closeOverview()">✕ Schließen</button>
+  </div>
+</div>
 
 <!-- KALENDER MODAL -->
 <div class="modal" id="calModal">
@@ -528,7 +540,101 @@ function showToast(msg) {
   setTimeout(()=>t.classList.remove('show'), 2000);
 }
 
-// ─── NEXT APPOINTMENT ────────────────────────────────────
+// ─── ÜBERSICHT ───────────────────────────────────────────
+function openOverview() {
+  const TAGE = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
+
+  // ─ PLAN-TABELLE ─
+  const planRows = Object.entries(PLAN).map(([dow, p]) => {
+    const tagName = TAGE[dow-1] || '?';
+    return `<tr>
+      <td style="padding:9px 6px;font-size:13px;font-weight:600;color:#333;">${tagName}</td>
+      <td style="padding:9px 6px;text-align:center;font-size:13px;color:#666;">${p.von}–${p.bis}</td>
+      <td style="padding:9px 6px;text-align:center;font-size:14px;font-weight:700;color:#3db356;">
+        ${p.soll.toLocaleString('de-DE',{minimumFractionDigits:1})}h
+      </td>
+    </tr>`;
+  }).join('');
+
+  // ─ EINTRÄGE-TABELLE ─
+  const allEntries = Object.entries(entries).sort((a,b)=>a[0].localeCompare(b[0]));
+  let totalSaldo = 0;
+  let eintraegeHTML = '';
+
+  if (allEntries.length) {
+    const rows = allEntries.map(([ds, e]) => {
+      const d = new Date(ds+'T12:00:00');
+      const plan = PLAN[d.getDay()];
+      const soll = plan ? plan.soll : 0;
+      const diff = Math.round(((e.hours||0) - soll)*100)/100;
+      totalSaldo += diff;
+      const dayStr = d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'});
+      const statusIcon = {normal:'',frei:'⭐',krank:'😷',schule:'🚫'}[e.status||'normal']||'';
+      const diffStr = diff > 0 ? `+${diff.toLocaleString('de-DE')}` : diff.toLocaleString('de-DE');
+      const diffColor = diff > 0 ? '#27ae60' : diff < 0 ? '#d9534f' : '#999';
+      return `<tr>
+        <td style="padding:9px 6px;font-size:13px;font-weight:600;color:#333;">${dayStr}</td>
+        <td style="padding:9px 6px;text-align:center;">${statusIcon}</td>
+        <td style="padding:9px 6px;text-align:center;font-size:14px;font-weight:600;">
+          ${(e.hours||0).toLocaleString('de-DE',{minimumFractionDigits:1})}h
+        </td>
+        <td style="padding:9px 6px;text-align:right;font-size:13px;font-weight:600;color:${diffColor};">
+          ${diffStr}h
+        </td>
+      </tr>`;
+    }).join('');
+
+    totalSaldo = Math.round(totalSaldo*100)/100;
+    const totalSign = totalSaldo >= 0 ? '+' : '';
+    const totalColor = totalSaldo >= 0 ? '#27ae60' : '#d9534f';
+
+    eintraegeHTML = `
+      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin:20px 0 8px;">Einträge</div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:2px solid #eee;">
+            <th style="padding:6px;text-align:left;font-size:11px;color:#aaa;">Datum</th>
+            <th style="padding:6px;text-align:center;font-size:11px;color:#aaa;"></th>
+            <th style="padding:6px;text-align:center;font-size:11px;color:#aaa;">Std.</th>
+            <th style="padding:6px;text-align:right;font-size:11px;color:#aaa;">Diff.</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr style="border-top:2px solid #eee;">
+            <td colspan="3" style="padding:12px 6px;font-weight:700;font-size:14px;">Saldo gesamt</td>
+            <td style="padding:12px 6px;text-align:right;font-weight:800;font-size:16px;color:${totalColor};">
+              ${totalSign}${totalSaldo.toLocaleString('de-DE')}h
+            </td>
+          </tr>
+        </tfoot>
+      </table>`;
+  } else {
+    eintraegeHTML = `<div style="text-align:center;color:#bbb;padding:16px;font-size:13px;">Noch keine Einträge vorhanden.</div>`;
+  }
+
+  document.getElementById('overviewContent').innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Mein Wochenplan</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:2px solid #eee;">
+          <th style="padding:6px;text-align:left;font-size:11px;color:#aaa;">Tag</th>
+          <th style="padding:6px;text-align:center;font-size:11px;color:#aaa;">Zeiten</th>
+          <th style="padding:6px;text-align:center;font-size:11px;color:#aaa;">Soll</th>
+        </tr>
+      </thead>
+      <tbody>${planRows}</tbody>
+    </table>
+    ${eintraegeHTML}`;
+
+  document.getElementById('overviewModal').classList.add('open');
+}
+
+function closeOverview() {
+  document.getElementById('overviewModal').classList.remove('open');
+}
+
+
 function renderNextAppointment() {
   // Einfach: zeige nächsten Schultag/Ereignis falls vorhanden
   // Placeholder – kann später mit echten Terminen gefüllt werden

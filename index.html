@@ -403,7 +403,10 @@ function doRegister() {
 
   const totalSoll = schedule.reduce((sum,s)=>sum+s.soll, 0);
   const vorbereitung = (selectedRolle === 'erzieher' || selectedRolle === 'teamleitung') ? 1 : 0;
-  const wochenstunden = Math.round((totalSoll + vorbereitung + selectedZusatz)*10)/10;
+  // Wochenstunden: für Erzieher/Teamleitung immer 31h, für andere aus Schedule berechnet
+  const wochenstunden = (selectedRolle === 'erzieher' || selectedRolle === 'teamleitung')
+    ? 31 + selectedZusatz
+    : Math.round((totalSoll + selectedZusatz) * 10) / 10;
 
   const userData = {
     name: nameKey,
