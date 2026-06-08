@@ -15,10 +15,11 @@ body {
 }
 
 /* HEADER */
-.header { text-align:center; color:white; padding:32px 20px 10px; }
-.header-sub { font-size:11px; letter-spacing:3px; opacity:0.7; margin-bottom:12px; }
-.header-name { font-size:44px; font-weight:600; margin-bottom:6px; }
-.header-org { font-size:13px; letter-spacing:2px; opacity:0.75; margin-bottom:14px; }
+.header { text-align:center; color:white; padding:18px 16px 8px; }
+.header-school { font-size:10px; letter-spacing:1.5px; color:rgba(255,255,255,0.5); margin-bottom:4px; }
+.header-sub { font-size:13px; letter-spacing:4px; color:rgba(255,255,255,0.65); margin-bottom:2px; font-weight:500; }
+.header-name { font-size:clamp(26px, 9vw, 44px); font-weight:700; line-height:1.05; margin-bottom:10px; }
+.header-org { display:none; }
 .badges { display:flex; margin:0 14px; }
 .badge-bar {
   background:rgba(0,0,0,0.25);
@@ -278,9 +279,10 @@ body {
 <body>
 
 <div class="header">
+  <div class="header-school">RGT · Arnold-Janssen-Schule · Goch</div>
   <div class="header-sub">STUNDENZETTEL</div>
   <div class="header-name" id="userName">Marc Hoss</div>
-  <div class="header-org">RGT · Arnold-Janssen-Schule</div>
+  <div class="header-org"></div>
   <div class="badges">
     <div class="badge-bar">
       <div class="badge-bar-item">
@@ -381,9 +383,11 @@ body {
 </div>
 
 <div class="footer">
-  <button class="btn-footer" onclick="manualSave()">💾</button>
+  <button class="btn-footer" onclick="manualSave()" title="Speichern">💾</button>
+  <button class="btn-footer" onclick="printView()" title="Drucken">🖨️</button>
   <button class="btn-cal-main" id="btnCalMain" onclick="calMainAction()">📅</button>
-  <button class="btn-footer" onclick="shareJanine()">📤</button>
+  <button class="btn-footer" onclick="shareJanine()" title="Teilen">📤</button>
+  <button class="btn-footer" onclick="openOverview()" title="Archiv">📁</button>
 </div>
 
 <div class="toast" id="toast">Gespeichert ✓</div>
@@ -854,6 +858,10 @@ function updateCalBtn() {
     btn.classList.add('is-back');
     btn.title = 'Zurück zu Heute';
   }
+}
+
+function printView() {
+  showToast('🖨️ Drucken kommt bald...');
 }
 
 function goHome() {
