@@ -95,7 +95,17 @@ body {
   border-radius:14px; font-size:12px; font-weight:600;
   cursor:pointer; transition:all 0.15s; color:#555;
 }
-.btn-status:active { transform:scale(0.96); }
+.btn-team {
+  width:100%; padding:13px; margin-bottom:18px;
+  border:2px solid #e0e0e0; background:white;
+  border-radius:14px; font-size:14px; font-weight:600;
+  cursor:pointer; color:#555; transition:all 0.15s;
+  font-family:'Poppins',sans-serif;
+}
+.btn-team.active {
+  border-color:#4f9ff0; background:#f0f7ff; color:#4f9ff0;
+}
+.btn-team .teamLabel { font-size:12px; opacity:0.7; margin-left:4px; }
 .btn-status.active { border-color:#3db356; background:#f0faf3; color:#27ae60; }
 .btn-status.active.rot { border-color:#d9534f; background:#fff0f0; color:#d9534f; }
 
@@ -238,6 +248,11 @@ body {
     <button class="btn-status" id="btn-krank"  onclick="setStatus('krank')">😷 Krank</button>
     <button class="btn-status" id="btn-schule" onclick="setStatus('schule')">🚫 Schule</button>
   </div>
+
+  <!-- TEAMTAG TOGGLE -->
+  <button class="btn-team" id="btn-team" onclick="toggleTeam()">
+    🤝 Teamtag <span id="teamLabel">+1h</span>
+  </button>
 
   <div class="notes-label">📝 Bemerkungen</div>
   <textarea class="notes-input" id="notesInput" placeholder="Notizen zu diesem Tag..."></textarea>
@@ -448,6 +463,7 @@ function render() {
 
   updateDisplay(soll);
   updateStatusBtns(entry.status||'normal');
+  updateTeamBtn(entry.team || false);
   document.getElementById('notesInput').value = entry.notes||'';
   updateSaldo();
 
@@ -522,6 +538,31 @@ function setStatus(status) {
   updateDisplay(soll);
   updateStatusBtns(status);
   scheduleSave();
+}
+
+function toggleTeam() {
+  const ds = fmtDate(selectedDate);
+  if (!entries[ds]) entries[ds] = {hours: todayVal, status:'normal', notes:'', team:false};
+
+  const wasTeam = entries[ds].team || false;
+  entries[ds].team = !wasTeam;
+
+  // +1h wenn Teamtag aktiviert, -1h wenn deaktiviert
+  todayVal = Math.round((todayVal + (wasTeam ? -1 : +1)) * 100) / 100;
+  entries[ds].hours = todayVal;
+
+  const dow = selectedDate.getDay();
+  const soll = PLAN[dow] ? PLAN[dow].soll : 0;
+  updateDisplay(soll);
+  updateTeamBtn(entries[ds].team);
+  scheduleSave();
+}
+
+function updateTeamBtn(isTeam) {
+  const btn = document.getElementById('btn-team');
+  const lbl = document.getElementById('teamLabel');
+  btn.classList.toggle('active', isTeam);
+  lbl.textContent = isTeam ? '✓ aktiv' : '+1h';
 }
 
 function updateStatusBtns(status) {
