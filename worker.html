@@ -19,19 +19,21 @@ body {
 .header-sub { font-size:11px; letter-spacing:3px; opacity:0.7; margin-bottom:12px; }
 .header-name { font-size:44px; font-weight:600; margin-bottom:6px; }
 .header-org { font-size:13px; letter-spacing:2px; opacity:0.75; margin-bottom:14px; }
-.badges { display:flex; justify-content:center; }
+.badges { display:flex; margin:0 14px; }
 .badge-bar {
   background:rgba(0,0,0,0.25);
   border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px; padding:11px 20px;
-  display:flex; justify-content:space-around; align-items:center; gap:24px;
+  border-radius:14px; padding:11px 16px;
+  display:flex; justify-content:space-between;
+  align-items:center; width:100%;
 }
-.badge-bar-item { text-align:center; }
-.badge-bar-label { font-size:10px; color:rgba(255,255,255,0.45); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:3px; }
-.badge-bar-value { font-size:17px; font-weight:700; color:white; cursor:pointer; }
+.badge-bar-item { text-align:center; flex:1; }
+.badge-bar-label { font-size:9px; color:rgba(255,255,255,0.45); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:3px; }
+.badge-bar-value { font-size:16px; font-weight:700; color:white; cursor:pointer; }
 .badge-bar-value.neg { color:#f87171; }
 .badge-bar-value.pos { color:#86efac; }
-.badge-bar-divider { width:1px; height:28px; background:rgba(255,255,255,0.15); flex-shrink:0; }
+.badge-bar-divider { width:1px; height:28px; background:rgba(255,255,255,0.15); flex-shrink:0; margin:0 4px; }
+.badge-bar-icon { font-size:20px; cursor:pointer; }
 
 /* CARD */
 .card {
@@ -65,7 +67,7 @@ body {
   display:flex; justify-content:space-between; align-items:center;
   margin-bottom:2px;
 }
-.hours-value { font-size:48px; font-weight:800; color:#3db356; line-height:1; }
+.hours-value { font-size:56px; font-weight:800; color:#3db356; line-height:1; letter-spacing:-1px; }
 .hours-value.negative { color:#d9534f; }
 .hours-unit { font-size:13px; color:#aaa; margin-top:4px; }
 .ctrl-btns { display:flex; gap:10px; }
@@ -229,9 +231,9 @@ body {
 .cal-day {
   aspect-ratio:1; display:flex; flex-direction:column;
   align-items:center; justify-content:center;
-  border-radius:14px; cursor:pointer;
-  font-size:15px; font-weight:700;
-  min-height:56px; color:#333;
+  border-radius:10px; cursor:pointer;
+  font-size:14px; font-weight:700;
+  min-height:44px; color:#333;
   transition: transform 0.15s, box-shadow 0.15s;
   background:#f8f8f8;
   position:relative;
@@ -277,16 +279,19 @@ body {
         <div class="badge-bar-value" id="weekHours" onclick="openOverview()">31 Std.</div>
       </div>
       <div class="badge-bar-divider"></div>
-      <div class="badge-bar-item" style="display:flex;align-items:center;gap:16px;">
-        <div>
-          <div class="badge-bar-label">Saldo</div>
-          <div class="badge-bar-value" id="saldoBadge">+0,0h</div>
-        </div>
-        <button onclick="openSettings()" style="
-          background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15);
-          color:rgba(255,255,255,0.6); width:30px; height:30px; border-radius:8px;
-          font-size:14px; cursor:pointer; display:flex; align-items:center;
-          justify-content:center; flex-shrink:0;">⚙️</button>
+      <div class="badge-bar-item">
+        <div class="badge-bar-label">Saldo</div>
+        <div class="badge-bar-value" id="saldoBadge">+0,0h</div>
+      </div>
+      <div class="badge-bar-divider"></div>
+      <div class="badge-bar-item" onclick="openOverview()" style="cursor:pointer;">
+        <div class="badge-bar-label">Verlauf</div>
+        <div class="badge-bar-icon">📊</div>
+      </div>
+      <div class="badge-bar-divider"></div>
+      <div class="badge-bar-item" onclick="openSettings()" style="cursor:pointer;">
+        <div class="badge-bar-label">Einstellungen</div>
+        <div class="badge-bar-icon">⚙️</div>
       </div>
     </div>
   </div>
@@ -297,14 +302,16 @@ body {
     <div class="heute-badge" id="heuteBadge">HEUTE</div>
     <div class="card-date-right">
       <div class="day" id="cardDay">Mo, 8. Juni</div>
-      <div class="time" id="cardTime">–:–</div>
     </div>
   </div>
 
   <div class="hours-row">
-    <div>
+    <div style="display:flex; align-items:baseline; gap:10px;">
       <div class="hours-value" id="hoursVal">0,00</div>
-      <div class="hours-unit">Std.</div>
+      <div style="display:flex; flex-direction:column;">
+        <div class="hours-unit">Std.</div>
+        <div style="font-size:13px; color:#888; font-weight:500; white-space:nowrap;" id="cardTime">–:–</div>
+      </div>
     </div>
     <div class="ctrl-btns">
       <button class="btn-ctrl btn-minus" onclick="addHours(-0.5)">−</button>
@@ -454,6 +461,17 @@ body {
     </div>
     <div class="cal-grid" id="calGrid"></div>
     <button class="btn-heute" onclick="goToToday()">↩ Zurück zu Heute</button>
+    <!-- Nächster Termin kompakt -->
+    <div id="calNextTermin" style="
+      margin-top:12px; background:#f8f8f8; border-radius:12px;
+      padding:10px 14px; display:none;
+      border-left:3px solid #3db356;">
+      <div style="font-size:10px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Nächster Termin</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:13px;font-weight:600;color:#333;" id="calNextName">–</div>
+        <div style="font-size:11px;color:#3db356;font-weight:600;" id="calNextDate">–</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -979,6 +997,15 @@ function openCalendar() {
   calDate = new Date(selectedDate);
   renderCal();
   document.getElementById('calModal').classList.add('open');
+  // Nächster Termin im Modal anzeigen
+  const nd = document.getElementById('nextDate');
+  const nn = document.getElementById('nextName');
+  if (nd && nd.textContent !== '–') {
+    document.getElementById('calNextName').textContent =
+      (document.getElementById('nextIcon')?.textContent || '') + ' ' + nn.textContent;
+    document.getElementById('calNextDate').textContent = nd.textContent;
+    document.getElementById('calNextTermin').style.display = 'block';
+  }
 }
 
 function closeCalendar() {
