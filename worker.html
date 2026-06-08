@@ -387,11 +387,11 @@ body {
 </div>
 
 <div class="footer">
-  <button class="btn-footer" onclick="manualSave()" title="Speichern">💾</button>
-  <button class="btn-footer" onclick="printView()" title="Drucken">🖨️</button>
+  <button class="btn-footer" onclick="openSaveOptions()" title="Speichern">💾</button>
+  <button class="btn-footer" onclick="openArchiv()" title="Dokumente">📁</button>
   <button class="btn-cal-main" id="btnCalMain" onclick="calMainAction()">📅</button>
   <button class="btn-footer" onclick="shareJanine()" title="Teilen">📤</button>
-  <button class="btn-footer" onclick="openOverview()" title="Archiv">📁</button>
+  <button class="btn-footer" onclick="printView()" title="Drucken">🖨️</button>
 </div>
 
 <div class="toast" id="toast">Gespeichert ✓</div>
@@ -440,6 +440,56 @@ body {
       font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;">
       🗑 Alle meine Einträge löschen
     </button>
+  </div>
+</div>
+
+<!-- SPEICHERN-OPTIONEN MODAL -->
+<div class="modal" id="saveModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div style="width:32px;"></div>
+      <div class="modal-title">💾 Speichern</div>
+      <button class="btn-close" onclick="closeSaveModal()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;padding:4px 0 8px;">
+      <button onclick="manualSave(); closeSaveModal();" style="
+        padding:16px;background:#f0faf3;border:1.5px solid #3db356;
+        border-radius:14px;font-size:14px;font-weight:600;color:#27ae60;
+        cursor:pointer;font-family:'Poppins',sans-serif;text-align:left;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">💾</span>
+        <div><div style="font-weight:700;">Daten speichern</div>
+        <div style="font-size:12px;color:#aaa;margin-top:2px;">Alle Einträge lokal auf dem Gerät sichern</div></div>
+      </button>
+      <button onclick="savePDF();" style="
+        padding:16px;background:#f0f7ff;border:1.5px solid #4f9ff0;
+        border-radius:14px;font-size:14px;font-weight:600;color:#357abd;
+        cursor:pointer;font-family:'Poppins',sans-serif;text-align:left;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">📄</span>
+        <div><div style="font-weight:700;">Als PDF speichern</div>
+        <div style="font-size:12px;color:#aaa;margin-top:2px;">Aktuelle Ansicht als PDF exportieren</div></div>
+      </button>
+      <button onclick="saveSnapshot();" style="
+        padding:16px;background:#fafafa;border:1.5px solid #e0e0e0;
+        border-radius:14px;font-size:14px;font-weight:600;color:#555;
+        cursor:pointer;font-family:'Poppins',sans-serif;text-align:left;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">📊</span>
+        <div><div style="font-weight:700;">Monatsbericht speichern</div>
+        <div style="font-size:12px;color:#aaa;margin-top:2px;">Aktuellen Monat als Eintrag im Archiv ablegen</div></div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ARCHIV MODAL -->
+<div class="modal" id="archivModal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div style="width:32px;"></div>
+      <div class="modal-title">📁 Meine Dokumente</div>
+      <button class="btn-close" onclick="closeArchiv()">✕</button>
+    </div>
+    <div id="archivContent" style="overflow-y:auto;flex:1;"></div>
+    <button class="btn-heute" onclick="closeArchiv()">✕ Schließen</button>
   </div>
 </div>
 
@@ -889,8 +939,85 @@ function updateCalBtn() {
   }
 }
 
+// ─── SPEICHERN-OPTIONEN ──────────────────────────────────
+function openSaveOptions() {
+  document.getElementById('saveModal').classList.add('open');
+}
+function closeSaveModal() {
+  document.getElementById('saveModal').classList.remove('open');
+}
+
+function savePDF() {
+  closeSaveModal();
+  showToast('📄 PDF wird vorbereitet...');
+  setTimeout(() => window.print(), 500);
+}
+
+function saveSnapshot() {
+  const monat = new Date().toLocaleDateString('de-DE',{month:'long',year:'numeric'});
+  const saldo = (() => {
+    let s = parseFloat(userData.startsaldo)||0;
+    Object.entries(entries).forEach(([ds,e]) => {
+      const plan = PLAN[new Date(ds+'T12:00:00').getDay()];
+      if (plan) s += (e.hours||0) - plan.soll;
+    });
+    return Math.round(s*100)/100;
+  })();
+  const snapshots = JSON.parse(localStorage.getItem('snapshots_'+userData.name)||'[]');
+  snapshots.push({
+    monat, saldo, datum: new Date().toISOString(),
+    eintraege: Object.keys(entries).length
+  });
+  localStorage.setItem('snapshots_'+userData.name, JSON.stringify(snapshots));
+  closeSaveModal();
+  showToast('✓ Monatsbericht gespeichert');
+}
+
+// ─── ARCHIV ──────────────────────────────────────────────
+function openArchiv() {
+  const snapshots = JSON.parse(localStorage.getItem('snapshots_'+userData.name)||'[]');
+  const content = document.getElementById('archivContent');
+  if (!snapshots.length) {
+    content.innerHTML = `<div style="text-align:center;color:#ccc;padding:30px;">
+      <div style="font-size:40px;margin-bottom:10px;">📁</div>
+      <div>Noch keine Dokumente gespeichert.</div>
+      <div style="font-size:12px;margin-top:8px;color:#bbb;">Nutze 💾 → Monatsbericht speichern,<br>um Einträge hier abzulegen.</div>
+    </div>`;
+  } else {
+    content.innerHTML = snapshots.slice().reverse().map((s,i) => {
+      const c = s.saldo>=0?'#27ae60':'#d9534f';
+      const bg = s.saldo>=0?'#f0faf3':'#fff1f2';
+      const sign = s.saldo>=0?'+':'';
+      const d = new Date(s.datum).toLocaleDateString('de-DE',{day:'numeric',month:'short',year:'numeric'});
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:14px;background:#fafafa;border:1px solid #eee;border-radius:14px;margin-bottom:8px;">
+        <div>
+          <div style="font-size:14px;font-weight:700;">${s.monat}</div>
+          <div style="font-size:11px;color:#aaa;margin-top:2px;">${s.eintraege} Einträge · gespeichert am ${d}</div>
+        </div>
+        <div style="text-align:right;display:flex;align-items:center;gap:10px;">
+          <div style="font-size:16px;font-weight:800;color:${c};background:${bg};padding:5px 12px;border-radius:10px;">${sign}${s.saldo.toLocaleString('de-DE')}h</div>
+          <button onclick="deleteSnapshot(${snapshots.length-1-i})" style="background:none;border:none;color:#ddd;font-size:18px;cursor:pointer;">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('archivModal').classList.add('open');
+}
+
+function closeArchiv() {
+  document.getElementById('archivModal').classList.remove('open');
+}
+
+function deleteSnapshot(idx) {
+  const snapshots = JSON.parse(localStorage.getItem('snapshots_'+userData.name)||'[]');
+  snapshots.splice(idx,1);
+  localStorage.setItem('snapshots_'+userData.name, JSON.stringify(snapshots));
+  openArchiv();
+}
+
 function printView() {
-  showToast('🖨️ Drucken kommt bald...');
+  showToast('🖨️ Drucken...');
+  setTimeout(() => window.print(), 300);
 }
 
 function goHome() {
