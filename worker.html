@@ -102,7 +102,13 @@ body {
   cursor:pointer; color:#555; transition:all 0.15s;
   font-family:'Poppins',sans-serif;
 }
-.btn-team.active {
+.btn-verlaeng {
+  padding:10px 4px; border:2px solid #e8eef5; background:white;
+  border-radius:10px; font-size:12px; font-weight:600;
+  cursor:pointer; color:#4f9ff0; font-family:'Poppins',sans-serif;
+  transition:all 0.15s;
+}
+.btn-verlaeng.selected { border-color:#4f9ff0; background:#f0f7ff; }
   border-color:#4f9ff0; background:#f0f7ff; color:#4f9ff0;
 }
 .btn-team .teamLabel { font-size:12px; opacity:0.7; margin-left:4px; }
@@ -249,9 +255,26 @@ body {
     <button class="btn-status" id="btn-schule" onclick="setStatus('schule')">🚫 Schule</button>
   </div>
 
-  <!-- TEAMTAG TOGGLE -->
-  <button class="btn-team" id="btn-team" onclick="toggleTeam()">
+  <!-- TEAMTAG TOGGLE + VERLÄNGERUNG -->
+  <button class="btn-team" id="btn-team" onclick="toggleTeam()" style="display:none;">
     🤝 Teamtag <span id="teamLabel">+1h</span>
+  </button>
+  <div id="teamVerlaengerung" style="display:none; margin-bottom:18px;">
+    <div style="font-size:12px;color:#aaa;font-weight:600;margin-bottom:8px;">Team verlängert um...</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;">
+      <button class="btn-verlaeng" id="tv15"  onclick="teamVerlaengerung(0.25)">+15 min</button>
+      <button class="btn-verlaeng" id="tv30"  onclick="teamVerlaengerung(0.5)">+30 min</button>
+      <button class="btn-verlaeng" id="tv45"  onclick="teamVerlaengerung(0.75)">+45 min</button>
+      <button class="btn-verlaeng" id="tv60"  onclick="teamVerlaengerung(1.0)">+60 min</button>
+    </div>
+  </div>
+
+  <!-- RESET -->
+  <button onclick="resetToSoll()" style="
+    width:100%; padding:10px; background:#f5f5f5; color:#999;
+    border:none; border-radius:12px; font-size:13px; font-weight:600;
+    cursor:pointer; font-family:'Poppins',sans-serif; margin-bottom:18px;">
+    ↺ Auf Soll zurücksetzen
   </button>
 
   <div class="notes-label">📝 Bemerkungen</div>
@@ -504,9 +527,13 @@ function updateDisplay(soll) {
   const sollStr = soll.toLocaleString('de-DE', {minimumFractionDigits:1, maximumFractionDigits:2});
   document.getElementById('sollLabel').textContent = 'Soll: '+sollStr+'h';
 
+  const ds = fmtDate(selectedDate);
+  const entry = entries[ds] || {};
+  const status = entry.status || 'normal';
+
   const diff = Math.round((todayVal - soll)*100)/100;
   const stEl = document.getElementById('sollStatus');
-  if (todayVal < 0) {
+  if (status === 'schule') {
     stEl.textContent = '✗ kein Dienst';
     stEl.className = 'soll-status negative';
   } else if (diff > 0) {
@@ -571,11 +598,39 @@ function toggleTeam() {
   scheduleSave();
 }
 
+let teamVerlaengerungExtra = 0;
+
+function teamVerlaengerung(delta) {
+  const ds = fmtDate(selectedDate);
+  const dow = selectedDate.getDay();
+  const soll = PLAN[dow] ? PLAN[dow].soll : 0;
+
+  // Vorherige Verlängerung rückgängig, neue setzen
+  todayVal = Math.round((todayVal - teamVerlaengerungExtra + delta)*100)/100;
+  teamVerlaengerungExtra = delta;
+
+  if (!entries[ds]) entries[ds] = {hours: soll, status:'normal', notes:''};
+  entries[ds].hours = todayVal;
+  entries[ds].teamExtra = delta;
+
+  // Button markieren
+  [0.25, 0.5, 0.75, 1.0].forEach(v => {
+    const id = 'tv'+(v*60);
+    const b = document.getElementById(id);
+    if (b) b.classList.toggle('selected', v === delta);
+  });
+
+  updateDisplay(soll);
+  scheduleSave();
+}
+
 function updateTeamBtn(isTeam) {
   const btn = document.getElementById('btn-team');
   const lbl = document.getElementById('teamLabel');
+  const verl = document.getElementById('teamVerlaengerung');
   btn.classList.toggle('active', isTeam);
   lbl.textContent = isTeam ? '✓ aktiv' : '+1h';
+  if (verl) verl.style.display = isTeam ? 'block' : 'none';
 }
 
 function updateStatusBtns(status) {
@@ -598,14 +653,24 @@ function addHours(delta) {
   if (!entries[ds]) entries[ds] = {hours:soll, status:'normal', notes:''};
   entries[ds].hours = todayVal;
 
-  // Status zurück auf normal wenn positiv
-  if (todayVal >= 0 && entries[ds].status !== 'krank') {
-    entries[ds].status = 'normal';
-    updateStatusBtns('normal');
-  }
-
   updateDisplay(soll);
   scheduleSave();
+}
+
+function resetToSoll() {
+  const ds = fmtDate(selectedDate);
+  const dow = selectedDate.getDay();
+  const soll = PLAN[dow] ? PLAN[dow].soll : 0;
+  todayVal = soll;
+  if (!entries[ds]) entries[ds] = {hours:soll, status:'normal', notes:''};
+  entries[ds].hours = soll;
+  entries[ds].status = 'normal';
+  entries[ds].team = false;
+  updateDisplay(soll);
+  updateStatusBtns('normal');
+  updateTeamBtn(false);
+  scheduleSave();
+  showToast('↺ Zurückgesetzt');
 }
 
 // ─── SALDO ───────────────────────────────────────────────
@@ -688,93 +753,114 @@ function confirmDeleteData() {
 function openOverview() {
   const TAGE = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
 
-  // ─ PLAN-TABELLE ─
   const planRows = Object.entries(PLAN).map(([dow, p]) => {
     const tagName = TAGE[dow-1] || '?';
     return `<tr>
-      <td style="padding:9px 6px;font-size:13px;font-weight:600;color:#333;">${tagName}</td>
+      <td style="padding:9px 6px;font-size:13px;font-weight:600;">${tagName}</td>
       <td style="padding:9px 6px;text-align:center;font-size:13px;color:#666;">${p.von}–${p.bis}</td>
       <td style="padding:9px 6px;text-align:center;font-size:14px;font-weight:700;color:#3db356;">
         ${p.soll.toLocaleString('de-DE',{minimumFractionDigits:1})}h
       </td>
+      <td style="padding:9px 6px;text-align:center;">${p.teamtag?'🤝':''}</td>
     </tr>`;
   }).join('');
 
-  // ─ EINTRÄGE-TABELLE ─
   const allEntries = Object.entries(entries).sort((a,b)=>a[0].localeCompare(b[0]));
-  let totalSaldo = userData.startsaldo || 0;
-  let eintraegeHTML = '';
-  const startsaldoHint = totalSaldo !== 0
-    ? `<div style="background:#f5f9ff;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#4f9ff0;font-weight:600;">
-        📌 Startsaldo / Übertrag: ${totalSaldo > 0 ? '+' : ''}${totalSaldo.toLocaleString('de-DE')}h
-       </div>` : '';
+  const byMonth = {};
+  let jahresSaldo = userData.startsaldo || 0;
+  const jahresListe = [];
 
-  if (allEntries.length) {
-    const rows = allEntries.map(([ds, e]) => {
-      const d = new Date(ds+'T12:00:00');
-      const plan = PLAN[d.getDay()];
-      const soll = plan ? plan.soll : 0;
-      const diff = Math.round(((e.hours||0) - soll)*100)/100;
-      totalSaldo += diff;
-      const dayStr = d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'});
-      const statusIcon = {normal:'',frei:'⭐',krank:'😷',schule:'🚫'}[e.status||'normal']||'';
-      const diffStr = diff > 0 ? `+${diff.toLocaleString('de-DE')}` : diff.toLocaleString('de-DE');
-      const diffColor = diff > 0 ? '#27ae60' : diff < 0 ? '#d9534f' : '#999';
+  allEntries.forEach(([ds, e]) => {
+    const d = new Date(ds+'T12:00:00');
+    const plan = PLAN[d.getDay()];
+    if (!plan) return;
+    const diff = Math.round(((e.hours||0) - plan.soll)*100)/100;
+    const monat = d.toLocaleDateString('de-DE',{month:'long', year:'numeric'});
+    if (!byMonth[monat]) byMonth[monat] = [];
+    byMonth[monat].push({ds, d, e, plan, diff});
+  });
+
+  let eintraegeHTML = '';
+
+  if (Object.keys(byMonth).length) {
+    Object.entries(byMonth).forEach(([monat, tage]) => {
+      let monatsSaldo = 0;
+      const rows = tage.map(({d, e, diff}) => {
+        monatsSaldo += diff;
+        const dayStr = d.toLocaleDateString('de-DE',{weekday:'short',day:'numeric',month:'short'});
+        const icons = {normal:'',frei:'⭐',krank:'😷',schule:'🚫'};
+        const icon = icons[e.status||'normal'];
+        const bg = e.status==='schule'?'#fff5f5': e.status==='frei'?'#fffdf0': e.status==='krank'?'#f5f5f5':'white';
+        const diffStr = diff>0?`+${diff.toLocaleString('de-DE')}`:diff.toLocaleString('de-DE');
+        const diffColor = diff>0?'#27ae60':diff<0?'#d9534f':'#999';
+        const team = e.team ? ' 🤝' : '';
+        return `<tr style="background:${bg};">
+          <td style="padding:9px 6px;font-size:13px;font-weight:600;">${dayStr}${team}</td>
+          <td style="padding:9px 6px;text-align:center;">${icon}</td>
+          <td style="padding:9px 6px;text-align:center;font-size:14px;font-weight:600;">${(e.hours||0).toLocaleString('de-DE',{minimumFractionDigits:1})}h</td>
+          <td style="padding:9px 6px;text-align:right;font-size:13px;font-weight:700;color:${diffColor};">${diffStr}h</td>
+        </tr>`;
+      }).join('');
+
+      monatsSaldo = Math.round(monatsSaldo*100)/100;
+      jahresSaldo += monatsSaldo;
+      jahresListe.push({monat, monatsSaldo});
+      const mc = monatsSaldo>=0?'#27ae60':'#d9534f';
+      const ms = monatsSaldo>=0?'+':'';
+
+      eintraegeHTML += `
+        <div style="font-size:13px;font-weight:700;color:#4f9ff0;margin:18px 0 6px;">${monat}</div>
+        <table style="width:100%;border-collapse:collapse;">
+          <tbody>${rows}</tbody>
+          <tr style="border-top:2px solid #eee;background:#f9f9f9;">
+            <td colspan="3" style="padding:10px 6px;font-weight:700;">Monatssaldo</td>
+            <td style="padding:10px 6px;text-align:right;font-weight:800;font-size:15px;color:${mc};">${ms}${monatsSaldo.toLocaleString('de-DE')}h</td>
+          </tr>
+        </table>`;
+    });
+
+    jahresSaldo = Math.round(jahresSaldo*100)/100;
+    const jc = jahresSaldo>=0?'#27ae60':'#d9534f';
+    const js = jahresSaldo>=0?'+':'';
+    const jahresRows = jahresListe.map(({monat, monatsSaldo}) => {
+      const mc = monatsSaldo>=0?'#27ae60':'#d9534f';
+      const ms = monatsSaldo>=0?'+':'';
       return `<tr>
-        <td style="padding:9px 6px;font-size:13px;font-weight:600;color:#333;">${dayStr}</td>
-        <td style="padding:9px 6px;text-align:center;">${statusIcon}</td>
-        <td style="padding:9px 6px;text-align:center;font-size:14px;font-weight:600;">
-          ${(e.hours||0).toLocaleString('de-DE',{minimumFractionDigits:1})}h
-        </td>
-        <td style="padding:9px 6px;text-align:right;font-size:13px;font-weight:600;color:${diffColor};">
-          ${diffStr}h
-        </td>
+        <td style="padding:8px 6px;font-size:13px;font-weight:600;">${monat}</td>
+        <td style="padding:8px 6px;text-align:right;font-weight:700;color:${mc};">${ms}${monatsSaldo.toLocaleString('de-DE')}h</td>
       </tr>`;
     }).join('');
 
-    totalSaldo = Math.round(totalSaldo*100)/100;
-    const totalSign = totalSaldo >= 0 ? '+' : '';
-    const totalColor = totalSaldo >= 0 ? '#27ae60' : '#d9534f';
-
-    eintraegeHTML = `
-      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin:20px 0 8px;">Einträge</div>
+    eintraegeHTML += `
+      <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin:24px 0 10px;">📊 Jahresübersicht</div>
       <table style="width:100%;border-collapse:collapse;">
-        <thead>
-          <tr style="border-bottom:2px solid #eee;">
-            <th style="padding:6px;text-align:left;font-size:11px;color:#aaa;">Datum</th>
-            <th style="padding:6px;text-align:center;font-size:11px;color:#aaa;"></th>
-            <th style="padding:6px;text-align:center;font-size:11px;color:#aaa;">Std.</th>
-            <th style="padding:6px;text-align:right;font-size:11px;color:#aaa;">Diff.</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-        <tfoot>
-          <tr style="border-top:2px solid #eee;">
-            <td colspan="3" style="padding:12px 6px;font-weight:700;font-size:14px;">Saldo gesamt</td>
-            <td style="padding:12px 6px;text-align:right;font-weight:800;font-size:16px;color:${totalColor};">
-              ${totalSign}${totalSaldo.toLocaleString('de-DE')}h
-            </td>
-          </tr>
-        </tfoot>
+        <tbody>${jahresRows}</tbody>
+        <tr style="border-top:3px solid #eee;">
+          <td style="padding:12px 6px;font-weight:800;font-size:15px;">Gesamt</td>
+          <td style="padding:12px 6px;text-align:right;font-weight:800;font-size:18px;color:${jc};">${js}${jahresSaldo.toLocaleString('de-DE')}h</td>
+        </tr>
       </table>`;
   } else {
-    eintraegeHTML = `<div style="text-align:center;color:#bbb;padding:16px;font-size:13px;">Noch keine Einträge vorhanden.</div>`;
+    eintraegeHTML = `<div style="text-align:center;color:#ccc;padding:20px;font-size:13px;">Noch keine Einträge vorhanden.</div>`;
   }
+
+  const startsaldoHint = (userData.startsaldo||0) !== 0
+    ? `<div style="background:#f0f7ff;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#4f9ff0;font-weight:600;">📌 Startsaldo: ${(userData.startsaldo>0?'+':'')+userData.startsaldo.toLocaleString('de-DE')}h</div>` : '';
 
   document.getElementById('overviewContent').innerHTML = `
     <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">Mein Wochenplan</div>
     <table style="width:100%;border-collapse:collapse;">
-      <thead>
-        <tr style="border-bottom:2px solid #eee;">
-          <th style="padding:6px;text-align:left;font-size:11px;color:#aaa;">Tag</th>
-          <th style="padding:6px;text-align:center;font-size:11px;color:#aaa;">Zeiten</th>
-          <th style="padding:6px;text-align:center;font-size:11px;color:#aaa;">Soll</th>
-        </tr>
-      </thead>
+      <thead><tr style="border-bottom:2px solid #eee;">
+        <th style="padding:6px;text-align:left;font-size:11px;color:#aaa;">Tag</th>
+        <th style="padding:6px;text-align:center;font-size:11px;color:#aaa;">Zeiten</th>
+        <th style="padding:6px;text-align:center;font-size:11px;color:#aaa;">Soll</th>
+        <th style="padding:6px;font-size:11px;color:#aaa;"></th>
+      </tr></thead>
       <tbody>${planRows}</tbody>
     </table>
-    ${eintraegeHTML}
-    ${startsaldoHint}`;
+    ${startsaldoHint}
+    <div style="font-size:12px;font-weight:700;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin:20px 0 8px;">Meine Einträge</div>
+    ${eintraegeHTML}`;
 
   document.getElementById('overviewModal').classList.add('open');
 }
