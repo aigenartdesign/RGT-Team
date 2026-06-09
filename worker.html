@@ -485,6 +485,27 @@ body {
         <div><div style="font-weight:700;">Monatsbericht speichern</div>
         <div style="font-size:12px;color:#aaa;margin-top:2px;">Aktuellen Monat als Eintrag im Archiv ablegen</div></div>
       </button>
+
+      <div style="height:1px;background:#f0f0f0;margin:4px 0;"></div>
+
+      <button onclick="exportDaten();" style="
+        padding:16px;background:#fdf4ff;border:1.5px solid #d8a8f0;
+        border-radius:14px;font-size:14px;font-weight:600;color:#8b5cf6;
+        cursor:pointer;font-family:'Poppins',sans-serif;text-align:left;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">📤</span>
+        <div><div style="font-weight:700;">Daten exportieren</div>
+        <div style="font-size:12px;color:#aaa;margin-top:2px;">Backup als Datei speichern (z.B. für Gerätewechsel)</div></div>
+      </button>
+
+      <button onclick="document.getElementById('importFile').click();" style="
+        padding:16px;background:#fff8f0;border:1.5px solid #f0c080;
+        border-radius:14px;font-size:14px;font-weight:600;color:#c07020;
+        cursor:pointer;font-family:'Poppins',sans-serif;text-align:left;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">📥</span>
+        <div><div style="font-weight:700;">Daten importieren</div>
+        <div style="font-size:12px;color:#aaa;margin-top:2px;">Backup-Datei laden (z.B. nach Gerätewechsel)</div></div>
+      </button>
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importDaten(event)">
     </div>
   </div>
 </div>
