@@ -330,8 +330,8 @@ body {
       </div>
     </div>
     <div class="ctrl-btns" style="align-self:center; margin-top:-8px;">
-      <button class="btn-ctrl btn-minus" onclick="addHours(-0.5)">−</button>
-      <button class="btn-ctrl btn-plus"  onclick="addHours(+0.5)">+</button>
+      <button class="btn-ctrl btn-minus" onclick="addHours(-0.25)">−</button>
+      <button class="btn-ctrl btn-plus"  onclick="addHours(+0.25)">+</button>
     </div>
   </div>
 
@@ -1043,17 +1043,28 @@ function confirmDeleteData() {
 function openStundenplan() {
   const TAGE = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag'];
   
-  // ─── KOMPAKTE ÜBERSICHT (oben) ───
+  // ─── KOMPAKTE ÜBERSICHT MIT EDIT-FELDERN ───
   const overviewRows = TAGE.map((tag, idx) => {
     const day = idx + 1;
     const plan = PLAN[day] || {};
     const von = plan.von || '09:00';
     const bis = plan.bis || '17:00';
-    const std = plan.soll || 8;
-    return `<span style="font-size:11px;padding:4px 8px;background:#f0f0f0;border-radius:6px;white-space:nowrap;">${tag.substring(0,2)}: ${von}–${bis} <b>${std}h</b></span>`;
+    return `
+      <div style="padding:10px;background:#fff;border:1px solid #e0e0e0;border-radius:8px;margin-bottom:6px;">
+        <div style="font-size:11px;font-weight:700;color:#3db356;margin-bottom:6px;">${tag}</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="time" value="${von}" 
+            onchange="PLAN[${day}].von=this.value; updateStundenBerechnung(${day}); doSave();"
+            style="flex:1;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:11px;">
+          <span style="font-size:11px;color:#999;">–</span>
+          <input type="time" value="${bis}" 
+            onchange="PLAN[${day}].bis=this.value; updateStundenBerechnung(${day}); doSave();"
+            style="flex:1;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:11px;">
+        </div>
+      </div>`;
   }).join('');
 
-  // ─── SCHULSTUNDENPLAN (neu) ───
+  // ─── SCHULSTUNDENPLAN ───
   const stundenplan = [
     { stunde: '1. Stunde', zeit: '08:05–08:50' },
     { stunde: '2. Stunde', zeit: '08:50–09:35' },
@@ -1070,8 +1081,8 @@ function openStundenplan() {
   ];
 
   const selectedDate = new Date();
-  const dayOfWeek = selectedDate.getDay(); // 0=Sonntag, 1=Montag
-  const dayIndex = dayOfWeek === 0 ? 4 : dayOfWeek - 1; // Montag=0
+  const dayOfWeek = selectedDate.getDay();
+  const dayIndex = dayOfWeek === 0 ? 4 : dayOfWeek - 1;
   const dayName = TAGE[dayIndex] || 'Montag';
   
   let stundenplanHTML = '';
@@ -1095,20 +1106,56 @@ function openStundenplan() {
   });
 
   document.getElementById('stundenplanContent').innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div style="font-size:10px;color:#999;margin-bottom:8px;font-weight:600;">📝 ARBEITSZEITEN EDITIEREN:</div>
+      ${overviewRows}
+    </div>
+    
     <div style="padding:12px;background:#f9f9f9;border-radius:10px;margin-bottom:16px;">
-      <div style="font-size:10px;color:#999;margin-bottom:6px;font-weight:600;">📊 WÖCHENTLICHE ARBEITSZEITEN:</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        ${overviewRows}
+      <div style="font-size:10px;color:#999;margin-bottom:6px;font-weight:600;">📊 WÖCHENTLICHE ARBEITSZEITEN (inkl. Pause):</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11px;">
+        ${TAGE.map((tag, idx) => {
+          const day = idx + 1;
+          const plan = PLAN[day] || {};
+          const std = plan.soll || 8;
+          return `<span style="padding:4px 8px;background:#e8f5e9;border-radius:6px;white-space:nowrap;">${tag.substring(0,2)}: <b>${std}h</b></span>`;
+        }).join('')}
       </div>
     </div>
     
     <div style="margin-bottom:12px;">
       <div style="font-size:12px;font-weight:700;color:#3db356;margin-bottom:10px;">📚 PERSÖNLICHER STUNDENPLAN – ${dayName}</div>
-      <div style="font-size:11px;color:#888;margin-bottom:12px;">Trage hier deine Fächer/Aktivitäten ein (z.B. Deutsch, Mathe, Sport):</div>
+      <div style="font-size:11px;color:#888;margin-bottom:12px;">Trage hier deine Fächer/Aktivitäten ein:</div>
       ${stundenplanHTML}
     </div>`;
   
   document.getElementById('stundenplanModal').classList.add('open');
+}
+
+// ─── HILFSFUNKTION: Stunden neu berechnen (mit Pause) ───
+function updateStundenBerechnung(day) {
+  const plan = PLAN[day] || {};
+  const von = plan.von || '09:00';
+  const bis = plan.bis || '17:00';
+  
+  const [vH, vM] = von.split(':').map(Number);
+  const [bH, bM] = bis.split(':').map(Number);
+  
+  let vonMin = vH * 60 + vM;
+  let bisMin = bH * 60 + bM;
+  
+  let arbeitsMin = bisMin - vonMin;
+  
+  // Pause 09:35–10:05 (30 Min) abziehen wenn in dieser Zeit gearbeitet
+  const pauseVonMin = 9 * 60 + 35;  // 09:35
+  const pauseBisMin = 10 * 60 + 5;  // 10:05
+  
+  if (vonMin < pauseBisMin && bisMin > pauseVonMin) {
+    arbeitsMin -= 30;
+  }
+  
+  const stunden = arbeitsMin / 60;
+  PLAN[day].soll = Math.round(stunden * 10) / 10;
 }
 
 function closeStundenplan() {
