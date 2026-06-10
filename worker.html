@@ -652,20 +652,23 @@ window.addEventListener('DOMContentLoaded', () => {
         display:flex;align-items:center;justify-content:center;padding:20px;`;
       box.innerHTML = `
         <div style="background:#fff;border-radius:16px;padding:24px;max-width:360px;width:100%;font-family:'Poppins',sans-serif;">
-          <div style="font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:16px;">💾 Wichtig für deine Daten</div>
+          <div style="font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:16px;">📱 Kurzer Hinweis</div>
           
           <div style="background:#f0fdf4;border-radius:10px;padding:12px;margin-bottom:10px;">
-            <div style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px;">📱 iPhone – Safari nutzen</div>
-            <div style="font-size:12px;color:#374151;line-height:1.5;">Beim normalen Cache leeren bleiben deine Daten erhalten. Bitte <b>Safari</b> verwenden!</div>
+            <div style="font-size:13px;font-weight:700;color:#166534;margin-bottom:4px;">Wo sind deine Daten?</div>
+            <div style="font-size:12px;color:#374151;line-height:1.6;">Deine Stunden werden <b>nur auf deinem Handy</b> gespeichert – nicht im Internet. Kein Passwort nötig.</div>
           </div>
-          
+
           <div style="background:#fff7ed;border-radius:10px;padding:12px;margin-bottom:10px;">
-            <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:4px;">🤖 Android – Chrome nutzen</div>
-            <div style="font-size:12px;color:#374151;line-height:1.5;">Bitte <b>niemals</b> "Browserdaten löschen" antippen – sonst sind alle Stundendaten weg!</div>
+            <div style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:4px;">⚠️ Das solltest du vermeiden:</div>
+            <div style="font-size:12px;color:#374151;line-height:1.6;">
+              <b>iPhone (Safari):</b> Einstellungen → Safari → <b>"Verlauf und Websitedaten löschen"</b> – das löscht alle deine Stunden!<br><br>
+              <b>Android (Chrome):</b> Browser-Menü → <b>"Browserdaten löschen"</b> – ebenfalls alles weg!
+            </div>
           </div>
           
           <div style="background:#f0f9ff;border-radius:10px;padding:12px;margin-bottom:16px;">
-            <div style="font-size:12px;color:#374151;line-height:1.5;">💡 Für beide gilt: Regelmäßig als <b>PDF exportieren</b> als Backup!</div>
+            <div style="font-size:12px;color:#374151;line-height:1.6;">💡 <b>Tipp:</b> Speichere regelmäßig ein <b>PDF oder ein Backup</b> – dann sind deine Daten sicher, egal was passiert!</div>
           </div>
           
           <button onclick="this.closest('div[style*=fixed]').remove(); localStorage.setItem('${hinweisKey}','1');"
