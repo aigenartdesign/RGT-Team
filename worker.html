@@ -350,8 +350,8 @@ body {
       </div>
     </div>
     <div class="ctrl-btns" style="align-self:center; margin-top:-8px;">
-      <button class="btn-ctrl btn-minus" onclick="addHours(-0.25)">−</button>
-      <button class="btn-ctrl btn-plus"  onclick="addHours(+0.25)">+</button>
+      <button class="btn-ctrl btn-minus" onclick="addHours(-0.0833)">−</button>
+      <button class="btn-ctrl btn-plus"  onclick="addHours(+0.0833)">+</button>
     </div>
   </div>
 
@@ -987,7 +987,11 @@ function addHours(delta) {
   const dow = selectedDate.getDay();
   const soll = PLAN[dow] ? PLAN[dow].soll : 0;
 
-  todayVal = Math.round((todayVal + delta)*100)/100;
+  // Auf 5-Minuten-Schritte runden (5 Min = 1/12 Stunde)
+  const raw = todayVal + delta;
+  todayVal = Math.round(raw * 12) / 12;
+  todayVal = Math.round(todayVal * 100) / 100;
+
   if (!entries[ds]) entries[ds] = {hours:soll, status:'normal', notes:''};
   entries[ds].hours = todayVal;
 
